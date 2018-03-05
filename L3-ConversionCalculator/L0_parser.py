@@ -110,7 +110,7 @@ def parse(s):
     if ss != '':
         raise SyntaxError('some thing left')
 
-    print(e)
+    # print(e)
     return e
 def testMe():
     # print(parse("1 2"))

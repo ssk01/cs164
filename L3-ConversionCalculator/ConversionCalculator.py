@@ -1,4 +1,6 @@
 from L0_parser import parse,init
+import re
+from functools import reduce
 
 env = {}
 def log(*args):
@@ -117,13 +119,12 @@ def runFailedTests(tests):
             eval(p)
             print("%s FAILED" % (p,))
         except Exception as exc: print("OK %s" % exc)
-# runTests(('2 m s^-1',
-#           '2 m s^-1 in ft/year'))
-# myUnits = (
-#     'SI s',  'minute = 60 s','hour = 60 minute','day = 24 hour','month = 30.5 day','year = 365 day', 'year in s',
-#     'SI m',  'km = 1000 m', 'ft = 0.3048 m', 'inch = 0.0254 m','yard = 36 inch',
-#              'acre = 4840 yard^2'
-#     )
+
+myUnits = (
+    'SI s',  'minute = 60 s','hour = 60 minute','day = 24 hour','month = 30.5 day','year = 365 day', 'year in s',
+    'SI m',  'km = 1000 m', 'ft = 0.3048 m', 'inch = 0.0254 m','yard = 36 inch',
+             'acre = 4840 yard^2'
+    )
 
 # tests = (
 #              'SI m',
@@ -133,7 +134,6 @@ def runFailedTests(tests):
 #              'ft = 0.3048 m',
 #              '100000 ft in km'  
 #              )  
-runTests(tests + myUnits)
 tests = (   """
             now = 2009 year + 9 month + 3 day + 1 hour + 3 minute
             deadline = 2009 year + 11 month + 3 day
@@ -144,4 +144,22 @@ tests = (   """
             """,
              )
 
+def formatUnit(U):
+    q = lambda a,b,c:(b,c)[not a]
+    return reduce(lambda s,u: s+u+q(U[u]==1,'','^'+str(U[u]))+' ', sorted(U.keys()), '')
+
+def runTests(tests):
+    for t in tests:
+        for line in re.split(r'\s*\n\s*',t,re.MULTILINE):
+            # print(line)
+            if line == '': continue
+            #print "'"+line+"'"
+            r = eval(parse(line))
+            if r != None:
+                (q,U) = r
+                print('%s --> %s %s' % (line, q, formatUnit(U)))
+                
+runTests(myUnits + tests)
+# runTests(myUnits+('2 m s^-1',
+#           '2 m s^-1 in ft/year'))
 # runFailedTests((p33_,))
