@@ -11,6 +11,7 @@ def eval(e):
     if type(e) == type('s'): return lookupUnit(e)
     if type(e) == type(()): 
         #tuple: (+, 1, 1)
+        # eva* 1000 m, 
         if type(e[0]) is type(1) or type(e[0]) is type(1.0) and type(e[1]) is type({}): return e
         if e[0] == '+': return add(eval(e[1]), eval(e[2]))
         if e[0] == '-': return sub(eval(e[1]), eval(e[2]))
@@ -119,20 +120,28 @@ def runFailedTests(tests):
 # runTests(('2 m s^-1',
 #           '2 m s^-1 in ft/year'))
 # myUnits = (
-#     'SI s',  'minute = 60 s','hour = 60 minute','day = 24 hour','month = 30.5 day','year = 365 day',
+#     'SI s',  'minute = 60 s','hour = 60 minute','day = 24 hour','month = 30.5 day','year = 365 day', 'year in s',
 #     'SI m',  'km = 1000 m', 'ft = 0.3048 m', 'inch = 0.0254 m','yard = 36 inch',
 #              'acre = 4840 yard^2'
 #     )
 
-tests = (
-             'SI m',
-             'm',
-             'km = 1000 m',
-             '2 km',
-             'ft = 0.3048 m',
-             '100000 ft in km'  
-             )  
+# tests = (
+#              'SI m',
+#              'm',
+#              'km = 1000 m',
+#              '2 km',
+#              'ft = 0.3048 m',
+#              '100000 ft in km'  
+#              )  
+runTests(tests + myUnits)
+tests = (   """
+            now = 2009 year + 9 month + 3 day + 1 hour + 3 minute
+            deadline = 2009 year + 11 month + 3 day
+            timeLeft = deadline - now
+            timeLeft in day
+            now = 2009 year + 9 month + 4 day + 1 hour + 3 minute
+            timeLeft in day
+            """,
+             )
 
-
-runTests(tests)
 # runFailedTests((p33_,))
