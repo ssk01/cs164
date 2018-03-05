@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+    <meta charset="utf-8">
+    <title>CS164: Language Popularity</title>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    </head>
+
+    <body>
+            <select onchange="logs(this)">
+                <option  >oop</option>
+                <option  selected="selected">all</option>
+                    <option >function</option>
+                        <option >laji</option>
+                        <!-- <option value="audi"></option> -->
+                </select> 
+            <svg width="720" height="120" id="go-bears">
+ 
+    <script>
+var logs = function(event) {
+    console.log('afd', event.value)
+    let s = event.value
+    let data = datasets
+    if (s != "all") {
+        data = datasets.filter(function(a){
+            for(var i = 0; i < a["type"].length; i++){
+                if (a["type"][i] == s){
+                    return true
+                }
+            }
+            return false
+        })
+    }
+    console.log('data', data)
+    doit(data)
+
+
+
+}
+var w = 700;
+var h = 500;
+var padding = 50;
+datasets = [
+    {"name":"JavaScript"	,"year":1975  ,"cishu":264131, "type":["oop","function"]},
+    {"name":"Ruby"	,"year":1985  ,"cishu":218812, "type":["oop"]},
+    {"name":"Java"	,"year":1965  ,"cishu":157618, "type":["laji","oop"]},
+    {"name":"PHP"	,"year":1940  ,"cishu":114384, "type":["laji"]},
+    {"name":"Python","year":2000  ,"cishu":	95002, "type":["function"]},
+    {"name":"C++","year":1930  ,"cishu":	78327, "type":["function"]},
+]
+var doit = function(dataset){
+    // log('dataset', dataset)
+    var xScale = d3.scale.linear()
+                            .domain([d3.min(dataset, function(d) { return d["year"]; }), d3.max(dataset, function(d) { return d["year"]; })])
+                            .range([padding, w - padding * 2]);
+
+    var yScale = d3.scale.linear()
+                            .domain([d3.min(dataset, function(d) { return d["cishu"]; }), d3.max(dataset, function(d) { return d['cishu']; })])
+                            .range([h - padding, padding]);
+
+    var rScale = d3.scale.linear()
+                            .domain([0, d3.max(dataset, function(d) { return 1; })])
+                            .range([2, 5]);
+    var svg = d3.select("#go-bears").attr("height", h).attr("width", w)
+    svg.selectAll("circle")
+        .data(dataset)
+        .enter()
+        .append("circle")
+        .attr("cx", function(d) {
+            return xScale(d["year"]);
+        })
+        .attr("cy", function(d) {
+            return yScale(d["cishu"]);
+        })
+        .attr("r", function(d) {
+            return rScale(0.5);
+        })
+    svg.selectAll("circle")
+        .data(dataset)
+        // .enter()
+        .attr("cx", function(d) {
+            return xScale(d["year"]);
+        })
+        .attr("cy", function(d) {
+            return yScale(d["cishu"]);
+        })
+        .attr("r", function(d) {
+            return rScale(0.5);
+        })
+    svg.selectAll("circle")
+        .data(dataset)
+        .exit().remove()
+    svg.selectAll("text")
+        .data(dataset)
+        .text(function(d) {
+            return d["name"]
+        })
+        .attr("x", function(d) {
+        return xScale(d["year"]);
+        })
+        .attr("y", function(d) {
+            return yScale(d["cishu"]);
+        })
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .attr("fill", "red");
+    svg.selectAll("text")
+        .data(dataset)
+        .enter()
+        .append("text")
+        .text(function(d) {
+            return d["name"]
+        })
+        .attr("x", function(d) {
+        return xScale(d["year"]);
+        })
+        .attr("y", function(d) {
+            return yScale(d["cishu"]);
+        })
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .attr("fill", "red");
+    svg.selectAll("text")
+        .data(dataset)
+        .exit().remove()
+    svg.append("g")
+        .attr("transform", "translate(0," + (h - padding) + ")")
+        .call(d3.svg.axis()
+                    .scale(xScale)
+                    );
+    var yAxis = d3.svg.axis()
+        .scale(yScale)
+        .orient("left")
+        .ticks(5);
+    svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + padding + ",0)")
+        .call(yAxis);
+}
+doit(datasets)
+    </script>
+    </body>
+</html>
