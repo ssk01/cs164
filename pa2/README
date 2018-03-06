@@ -1,0 +1,4 @@
+usage:
+    $ node main.js test.164
+   or:
+    $ nodejs main.js test.164

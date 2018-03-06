@@ -1,0 +1,108 @@
+def m = lambda (a,b) {a + b}
+
+text {
+  "\ndef m = lambda (a,b) {a + b}": {
+    "value": [
+      {
+        "type": "def", 
+        "name": {
+          "type": "id", 
+          "name": "m"
+        }, 
+        "value": {
+          "body": [
+            {
+              "body": {
+                "operand1": {
+                  "type": "id", 
+                  "name": "a"
+                }, 
+                "type": "+", 
+                "operand2": {
+                  "type": "id", 
+                  "name": "b"
+                }
+              }, 
+              "type": "exp"
+            }
+          ], 
+          "type": "lambda", 
+          "arguments": [
+            {
+              "type": "id", 
+              "name": "a"
+            }, 
+            {
+              "type": "id", 
+              "name": "b"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+
+def f(a,b) {\n   def x = 1\n   a + b\ndef  y = 1\n}": {
+    "value": [
+      {
+        "type": "def", 
+        "name": {
+          "type": "id", 
+          "name": "f"
+        }, 
+        "value": {
+          "body": [
+            {
+              "type": "def", 
+              "name": {
+                "type": "id", 
+                "name": "x"
+              }, 
+              "value": {
+                "type": "int-lit", 
+                "value": 1
+              }
+            }, 
+            {
+              "body": {
+                "operand1": {
+                  "type": "id", 
+                  "name": "a"
+                }, 
+                "type": "+", 
+                "operand2": {
+                  "type": "id", 
+                  "name": "b"
+                }
+              }, 
+              "type": "exp"
+            }, 
+            {
+              "type": "def", 
+              "name": {
+                "type": "id", 
+                "name": "y"
+              }, 
+              "value": {
+                "type": "int-lit", 
+                "value": 1
+              }
+            }
+          ], 
+          "type": "lambda", 
+          "arguments": [
+            {
+              "type": "id", 
+              "name": "a"
+            }, 
+            {
+              "type": "id", 
+              "name": "b"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

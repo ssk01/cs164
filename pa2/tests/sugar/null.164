@@ -1,0 +1,4 @@
+if (null) {
+} else {
+    print null
+}

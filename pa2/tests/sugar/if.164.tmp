@@ -1,0 +1,1 @@
+Parse error, parsing input program.Error: What's if? {"true":[{"type":"print","value":{"type":"int-lit","value":1}}],"false":[{"type":"print","value":{"type":"int-lit","value":2}}],"type":"if","condition":{"type":"int-lit","value":1}}

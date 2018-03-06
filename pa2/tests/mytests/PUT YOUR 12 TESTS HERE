@@ -1,0 +1,5 @@
+To test your interpreter, you will have to write program in our cs164a language. As part of the submission, you are required to submit 12 test cases. We will add interesting ones to our autograder. Thus, you have an incentive to make hard test cases to crash your classmates' submissions :-) Please submit at least the following test cases:
+    1 on assignments
+    3 on lexical scoping
+    3 on function calls with parameters
+    5 on syntactic sugar rewriting + any/all of the above.
