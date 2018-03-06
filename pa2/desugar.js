@@ -12,9 +12,20 @@ var desugarAST = (function() {
     // TODO: Write desugaring expansions for "while", "if" and "for",
     // replacing the example below
     "example": "def %u1 = %nodeattribute",
-    "if": " ite(%condition,lambda(){%true}, lambda(){%false}  )()"
+    "if": " ite(%condition,lambda(){%true}, lambda(){%false}  )()",
+    // "while":
+    //  "lambda(){function %u3(%e1, %e2){ %e33 = %e1() if (%e33){ %e2()}if (%e33){ %u3(%e1, %e2) } } %u3(lambda(){%condition}, lambda(){%body})}()" 
   };
-
+  // “if” : “(lambda(){ \
+  //            def %u1 = 
+  // %condition
+  // ; \
+  //            ite(%u1, lambda(){
+  // %true
+  // }, lambda(){
+  // %false
+  // })() \
+  //         })()”
   // compiled version of the raw expressions (created after the raw
   // expressions have parsed)
   var DESUGAR_AST_COMPILED = {};

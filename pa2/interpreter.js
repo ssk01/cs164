@@ -47,6 +47,24 @@ var interpret = function(asts, log, err) {
       case '/':
       // console.log('are you ',aa)
         return evalExpression(node.operand1, env) / evalExpression(node.operand2, env);
+      case '>':
+      // console.log('are you ',aa)
+        return evalExpression(node.operand1, env) > evalExpression(node.operand2, env);
+      case '<':
+      // console.log('are you ',aa)
+        return evalExpression(node.operand1, env) < evalExpression(node.operand2, env);
+      case '<=':
+      // console.log('are you ',aa)
+        return evalExpression(node.operand1, env) <=evalExpression(node.operand2, env);
+      case '>=':
+      // console.log('are you ',aa)
+        return evalExpression(node.operand1, env) >= evalExpression(node.operand2, env);
+      case '!=':
+      // console.log('are you ',aa)
+        return evalExpression(node.operand1, env) != evalExpression(node.operand2, env);
+      case '==':
+      // console.log('are you ',aa)
+        return evalExpression(node.operand1, env) == evalExpression(node.operand2, env);
       case "id":
         return envLookup(env, node.name);
       case "int-lit":
@@ -61,6 +79,7 @@ var interpret = function(asts, log, err) {
         if ((typeof cond != 'boolean') && (typeof cond != 'number')) {
           throw new ExecError('Condition not a boolean');
         }
+        console.log('cond, ', cond)
         return cond ? ct : cf;
       case "lambda":
         console.log('lambda  ',node)
@@ -72,9 +91,16 @@ var interpret = function(asts, log, err) {
           // no arguments, so you'll have to fix it.  The crucial steps are:
           // 1. Extend the environment with a new frame --- see environment.js.
           // 2. Add argument bindings to the new frame.
-          console.log('call fn  ',fn)
-
+          console.log('call fn  ',fn, 'node  ', node)
+          
           newEnv = envExtend(env)
+          if (node.arguments.length == fn.names.length){
+            console.log('ok')
+            for (var i = 0; i < node.arguments.length; i++){
+              envBind(newEnv,  fn.names[i].name, evalExpression(node.arguments[i], env))
+            }
+          }
+          console.log('env ', newEnv)
           return evalBlock(fn.body, newEnv);
         } else {
           throw new ExecError('Trying to call non-lambda');
@@ -92,6 +118,7 @@ var interpret = function(asts, log, err) {
         envBind(env, node.name.name, evalExpression(node.value, env));
         return null;
       case "print":
+        console.log(evalExpression(node.value, env))
         log(evalExpression(node.value, env));
         return null;
       case "error":

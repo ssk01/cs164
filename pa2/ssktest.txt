@@ -1,0 +1,77 @@
+def y = 1
+def y = 2
+______________________________
+def f () {
+    def x = 1
+    lambda () {x + 1}
+}
+def x = 0 
+print f()()
+_______________________
+
+if (1) {
+    print 1
+} else {
+    print 2
+}
+
+
+___
+1
+_______________
+
+
+
+
+def i =1
+def printOut(i) {
+  print i
+}
+printOut(i-3)
+
+ite(1, printOut(1), printOut(2))
+
+__________________
+
+
+
+
+
+
+______________________________
+def a = 3
+while(a >0) {
+    a = a -1
+}
+print a
+___
+def l = 2
+def fac(n) {
+     if (l <0)
+{
+     print 42
+print n
+1
+}else {
+
+l=l-1
+     print 42
+print n
+     if (n <= 1) {
+         1
+     } else {
+         n * fac(n-1)
+     }
+}
+} 
+print fac(2)
+//now ...no 
+
+def i = 3
+def x = lambda () {
+  if (i>0）{
+   i=i-1
+   x()
+  }
+}
+print i
