@@ -24,7 +24,6 @@ function envExtend(parent) {
 /* Binds a new value to the top frame. */
 function envBind(frame, name, value) {
   // TODO: Define "name", which must be bound to "value"
-	console.log('eb')
     if (frame.hasOwnProperty(name)) {
 		// log('dfadf')
 		console.log('already envbind ', name, )
@@ -33,7 +32,7 @@ function envBind(frame, name, value) {
       // ExecError("Error: "+name+ " is already declared".formatUnicorn({name:name}))
       	return
 	} 
-	console.log('envbind ', name, )
+	console.log('envbind ', name, value)
     frame[name] = value
     // Error: x is already declared
     // throw "Implement me!";

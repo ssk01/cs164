@@ -16,11 +16,12 @@ var interpret = function(asts, log, err) {
   root['*title'] = 'Root';
 
   // TODO: Complete the closure implementation. What's missing?
-  function makeClosure(names, body) {
+  function makeClosure(names, body,env) {
     return {
       names: names,
         body: body,
-        type: 'closure'
+        type: 'closure',
+        env:env
     };
   }
 
@@ -67,6 +68,8 @@ var interpret = function(asts, log, err) {
         return evalExpression(node.operand1, env) == evalExpression(node.operand2, env);
       case "id":
         return envLookup(env, node.name);
+      case "null":
+        return null
       case "int-lit":
         return node.value;
       case "ite":
@@ -83,7 +86,7 @@ var interpret = function(asts, log, err) {
         return cond ? ct : cf;
       case "lambda":
         console.log('lambda  ',node)
-        return makeClosure(node.arguments, node.body);
+        return makeClosure(node.arguments, node.body,env);
       case "call":
         var fn = evalExpression(node.function, env);
         if (fn.type && fn.type === 'closure') {
@@ -93,7 +96,7 @@ var interpret = function(asts, log, err) {
           // 2. Add argument bindings to the new frame.
           console.log('call fn  ',fn, 'node  ', node)
           
-          newEnv = envExtend(env)
+          newEnv = envExtend(fn.env)
           if (node.arguments.length == fn.names.length){
             console.log('ok')
             for (var i = 0; i < node.arguments.length; i++){
@@ -116,6 +119,7 @@ var interpret = function(asts, log, err) {
       // TODO: Complete for statements that aren't handled
       case "def":
         envBind(env, node.name.name, evalExpression(node.value, env));
+        console.log('def  .',node.name.name)
         return null;
       case "print":
         console.log(evalExpression(node.value, env))
