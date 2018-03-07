@@ -1,3 +1,33 @@
+def iter() {
+    def i = 0
+    lambda () {
+        if (i < 10) {
+            i = i + 1
+            i 
+        } else {
+            null    
+        }
+    } 
+}
+def a = iter()
+print a()
+print a()
+def iter() {
+    def i = 0
+    lambda () {
+        if (i < 10) {
+            i = i + 1
+            i 
+        } else {
+            null    
+        }
+    } 
+}
+for (x in iter()) {     
+    print x 
+}
+
+_________________________
 def y = 1
 def y = 2
 ______________________________

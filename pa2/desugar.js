@@ -13,8 +13,11 @@ var desugarAST = (function() {
     // replacing the example below
     "example": "def %u1 = %nodeattribute",
     "if": " ite(%condition,lambda(){%true}, lambda(){%false}  )()",
+    "while":"lambda(){def %u1 = lambda(cond, b){ite(cond(), lambda(){b(); %u1(cond,b)},lambda(){})();}; %u1(lambda(){%condition},lambda(){ %body})}()",
     // "while":
-    //  "lambda(){function %u3(%e1, %e2){ %e33 = %e1() if (%e33){ %e2()}if (%e33){ %u3(%e1, %e2) } } %u3(lambda(){%condition}, lambda(){%body})}()" 
+    "for": "lambda(){def %u2 = %iterable; def %name = %u2(); while(%name !=null){lambda(%name){%body}(%name);%name=%u2()}}()"
+    //  "(lambda(%u1, %u2){def %u3 = %u1() if (%u3){ %u2()}if (%u3){ %u3(%u1, %u2) } } )(lambda(){%condition}, lambda(){%body})" 
+    //  "lambda(){function %u3(%e1, %e2){def %e33 = %e1() if (%e33){ %e2()}if (%e33){ %u3(%e1, %e2) } } %u3(lambda(){%condition}, lambda(){%body})}()" 
   };
   // “if” : “(lambda(){ \
   //            def %u1 = 
@@ -165,6 +168,7 @@ var desugarAST = (function() {
   function desugarExport(tree, callback) {
     if (ready) {
       callback(desugar(tree));
+      console.log("DESUGAR_AST_COMPILED",DESUGAR_AST_COMPILED)
     } else {
       desugarQueue.push({input: tree, callback: callback});
     }

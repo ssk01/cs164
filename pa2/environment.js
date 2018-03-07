@@ -66,11 +66,14 @@ function envLookup(frame, name) {
   // TODO: Lookup the value of "name" in "env" in the current and previous frames
   f = frame
   if (frame.hasOwnProperty(name)) {
+    console.log('frame father ',name,frame[name])
+    
     return frame[name];
   } else {
     frame = frame['*parent']
     while (frame != null) {
       if (frame.hasOwnProperty(name)) {
+        console.log('frame father ',name,frame[name])
         return frame[name];
       }
       frame = frame['*parent']

@@ -21,7 +21,7 @@ var interpret = function(asts, log, err) {
       names: names,
         body: body,
         type: 'closure',
-        env:env
+        env:env,
     };
   }
 
@@ -82,11 +82,11 @@ var interpret = function(asts, log, err) {
         if ((typeof cond != 'boolean') && (typeof cond != 'number')) {
           throw new ExecError('Condition not a boolean');
         }
-        console.log('cond, ', cond)
+        console.log('cond, ', node.condition,cond)
         return cond ? ct : cf;
       case "lambda":
-        console.log('lambda  ',node)
-        return makeClosure(node.arguments, node.body,env);
+        console.log('lambda make closure ',node)
+        return makeClosure(node.arguments, node.body, env);
       case "call":
         var fn = evalExpression(node.function, env);
         if (fn.type && fn.type === 'closure') {
@@ -98,12 +98,12 @@ var interpret = function(asts, log, err) {
           
           newEnv = envExtend(fn.env)
           if (node.arguments.length == fn.names.length){
-            console.log('ok')
+            console.log('ok  jb')
             for (var i = 0; i < node.arguments.length; i++){
               envBind(newEnv,  fn.names[i].name, evalExpression(node.arguments[i], env))
             }
           }
-          console.log('env ', newEnv)
+          console.log('new env here ', newEnv)
           return evalBlock(fn.body, newEnv);
         } else {
           throw new ExecError('Trying to call non-lambda');
@@ -122,7 +122,7 @@ var interpret = function(asts, log, err) {
         console.log('def  .',node.name.name)
         return null;
       case "print":
-        console.log(evalExpression(node.value, env))
+        // console.log(evalExpression(node.value, env))
         log(evalExpression(node.value, env));
         return null;
       case "error":
