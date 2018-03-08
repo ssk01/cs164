@@ -25,12 +25,9 @@ function envExtend(parent) {
 function envBind(frame, name, value) {
   // TODO: Define "name", which must be bound to "value"
     if (frame.hasOwnProperty(name)) {
-		// log('dfadf')
 		console.log('already envbind ', name, )
 		var out = document.getElementById("out");
-        out.innerText = "Error: "+name+ " is already declared"
-      // ExecError("Error: "+name+ " is already declared".formatUnicorn({name:name}))
-      	return
+    throw new ExecError("is already declared")
 	} 
 	console.log('envbind ', name, value)
     frame[name] = value
@@ -53,11 +50,8 @@ function envUpdate(frame, name, value) {
         }
         frame = frame['*parent']
 	  }
-	  var out = document.getElementById("out");
-	  out.innerText = "Error: "+name+ " is not declared"
-    //   ExecError("Error: {name} is not declared".formatUnicorn({name:name}))
-    }
-  // consol
+    throw new ExecError(name + " is not declared");
+  }
   // throw "Implement me!";
 }
 
@@ -78,8 +72,8 @@ function envLookup(frame, name) {
       }
       frame = frame['*parent']
     }
-    console.log('can not found', name, f)
-    throw "Implement me!";
+    throw new ExecError(name + " is not declared");
+   
   } 
 }
 

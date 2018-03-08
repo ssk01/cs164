@@ -42,7 +42,7 @@ def runTest(test, ref_output, test_output):
         print ("Timeout")
         return 0
     except Exception as e:
-        print e
+        print (e)
         print ("Interpreter Error")
         return 0
 

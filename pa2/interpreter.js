@@ -47,7 +47,12 @@ var interpret = function(asts, log, err) {
         return evalExpression(node.operand1, env) * evalExpression(node.operand2, env);
       case '/':
       // console.log('are you ',aa)
-        return evalExpression(node.operand1, env) / evalExpression(node.operand2, env);
+        var rhs = evalExpression(node.operand2, env);
+        if (rhs != 0){
+          return evalExpression(node.operand1, env) / rhs;
+        } else {
+          return "Error: Division by zero";
+        }
       case '>':
       // console.log('are you ',aa)
         return evalExpression(node.operand1, env) > evalExpression(node.operand2, env);
@@ -71,6 +76,8 @@ var interpret = function(asts, log, err) {
       case "null":
         return null
       case "int-lit":
+        return node.value;
+      case "string-lit":
         return node.value;
       case "ite":
         var cond = evalExpression(node.condition, env);
@@ -140,8 +147,8 @@ var interpret = function(asts, log, err) {
       //     "type": "int-lit", 
       //     "value": 2
       //   }
-		envUpdate(env, node.name.name, evalExpression(node.value, env));
-		return null
+			 	envUpdate(env, node.name.name, evalExpression(node.value, env));
+        return null
       default:
         throw new Error(
           "What's " + node.type + "? " + JSON.stringify(node)
@@ -163,7 +170,7 @@ var interpret = function(asts, log, err) {
         desugarOne(remaining_asts);
       } catch (e) {
         if (e.constructor === ExecError) {
-          log('Error: 1' + e.message);
+          log('Error: ' + e.message);
         } else {
           throw e;
         }
