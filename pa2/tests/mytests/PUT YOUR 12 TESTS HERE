@@ -3,3 +3,89 @@ To test your interpreter, you will have to write program in our cs164a language.
     3 on lexical scoping
     3 on function calls with parameters
     5 on syntactic sugar rewriting + any/all of the above.
+__________________________
+def newList() {
+    def length = 0
+    def list = lambda(s) {}
+    def append(item) {
+        length = length + 1
+        def l = list
+        list = lambda(s){
+            if(s == 'first'){
+                item
+            } else {
+                l
+            }
+        }
+        list
+    }
+    lambda(func) {
+        if (func == 'add') {
+            append
+        } else {
+            if (func == 'get') {
+               lambda(s) {
+                   list(s)
+               }
+            } else {
+                if (func == 'length') {
+                    length
+                } else {
+                    if (func == 'clear') {
+                        length = 0
+                        list = lambda(s) {}
+                    }
+                }
+            }
+        }
+    }
+}
+def list = newList()
+list("add")(1)
+list("add")(3)
+list("add")(2)
+print list("get")("first")
+print list("get")("rest")("first")
+print list("get")("rest")("rest")("first")
+
+print "My list has " + list("length") + ' items in it!'
+list("clear")
+print list("get")("first")
+print "My list has " + list("length") + ' items in it!'
+//
+_____________________________
+def newList(val){
+    def l = 
+    lambda(x, y) {
+        if (x == 'get') {
+            v
+        } else   {
+          v = y
+        }
+    }
+}
+def list = newList(11)
+list('add', '1')
+list('add', '2')
+list('add', '3')
+list('first')
+list('rest')
+list('clear')
+list('length')
+
+
+__________________________
+def newList(val){
+    def v = val
+    lambda(x, y) {
+        if (x == 'get') {
+            v
+        } else   {
+          v = y
+        }
+    }
+}
+def list = newList(11)
+print list('get','')
+list('set', 10)
+print list('get','')

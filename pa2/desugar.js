@@ -49,6 +49,7 @@ var desugarAST = (function() {
   Object.keys(DESUGAR_AST_RAW).forEach(function(t) {
     rparse(DESUGAR_AST_RAW[t], function(parsed) {
       var expansionTree = parsed[0];
+      console.log('ast_raw ',DESUGAR_AST_RAW[t],'  ', expansionTree)
       // fillHoles does the heavy lifting, taking the original parse tree and
       // desugaring expressions according to expansion
       DESUGAR_AST_COMPILED[t] = function(parseTree) {
@@ -76,6 +77,7 @@ var desugarAST = (function() {
       for (var key in node) {
         out[key] = f(node[key]);
       }
+      console.log('out ', out, 'node ', node)
       return out;
     } else {
       return f(node);
@@ -96,7 +98,7 @@ var desugarAST = (function() {
     // cache so that all holes filled during this call are consistent (ie two
     // occurences of %u12 are replaced with the same unique variable name)
     var cache = [];
-
+    console.log('expansion tree ', expansionTree, 'parse tree', parseTree)
     function fill(node) {
       // we found a macro node, which means that it need
       if (typeof(node) === 'object' && node.type === 'macro') {

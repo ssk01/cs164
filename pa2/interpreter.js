@@ -54,23 +54,42 @@ var interpret = function(asts, log, err) {
           return "Error: Division by zero";
         }
       case '>':
-      // console.log('are you ',aa)
-        return evalExpression(node.operand1, env) > evalExpression(node.operand2, env);
+        if(evalExpression(node.operand1, env) > evalExpression(node.operand2, env)){
+            return 1
+        } else {
+            return 0
+        };
       case '<':
-      // console.log('are you ',aa)
-        return evalExpression(node.operand1, env) < evalExpression(node.operand2, env);
+        if(evalExpression(node.operand1, env) < evalExpression(node.operand2, env)){
+            return 1
+        } else {
+            return 0
+        };
       case '<=':
-      // console.log('are you ',aa)
-        return evalExpression(node.operand1, env) <=evalExpression(node.operand2, env);
+        if(evalExpression(node.operand1, env) <=evalExpression(node.operand2, env)){
+            return 1
+        } else {
+            return 0
+        };
       case '>=':
       // console.log('are you ',aa)
-        return evalExpression(node.operand1, env) >= evalExpression(node.operand2, env);
+        if(evalExpression(node.operand1, env) >= evalExpression(node.operand2, env)){
+            return 1
+        } else {
+            return 0
+        };
       case '!=':
-      // console.log('are you ',aa)
-        return evalExpression(node.operand1, env) != evalExpression(node.operand2, env);
+        if(evalExpression(node.operand1, env) != evalExpression(node.operand2, env)){
+            return 1
+        } else {
+            return 0
+        };
       case '==':
-      // console.log('are you ',aa)
-        return evalExpression(node.operand1, env) == evalExpression(node.operand2, env);
+        if(evalExpression(node.operand1, env) == evalExpression(node.operand2, env)){
+            return 1
+        } else {
+            return 0
+        };
       case "id":
         return envLookup(env, node.name);
       case "null":
@@ -105,7 +124,7 @@ var interpret = function(asts, log, err) {
           
           newEnv = envExtend(fn.env)
           if (node.arguments.length == fn.names.length){
-            console.log('ok  jb')
+            console.log('ok  jb', )
             for (var i = 0; i < node.arguments.length; i++){
               envBind(newEnv,  fn.names[i].name, evalExpression(node.arguments[i], env))
             }
@@ -158,6 +177,7 @@ var interpret = function(asts, log, err) {
 
   var desugarOne = function(asts){
     var ast, remaining_asts;
+    
     if (asts.length > 0){
       ast = asts.shift(); //pops first item
       remaining_asts = asts; //first item already popped
@@ -165,7 +185,7 @@ var interpret = function(asts, log, err) {
     else{ return; } // no more ASTs to eval
     desugarAST(ast, function(ast) {
       try {
-		console.log("per ast", ast )
+		console.log("per ast___:", ast, '  ', remaining_asts)
         evalBlock(ast, root);
         desugarOne(remaining_asts);
       } catch (e) {
@@ -177,7 +197,7 @@ var interpret = function(asts, log, err) {
       }
     });
   };
-  console.log('nmb  desugar ', asts[0])
+  console.log('nmb  desugar ', asts)
   desugarOne(asts);
 };
 

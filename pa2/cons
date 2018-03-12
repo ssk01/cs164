@@ -1,3 +1,40 @@
+"def f() {\n1\n}\nprint f()": {
+    "value": [
+      {
+        "type": "def", 
+        "name": {
+          "type": "id", 
+          "name": "f"
+        }, 
+        "value": {
+          "body": [
+            {
+              "body": {
+                "type": "int-lit", 
+                "value": 1
+              }, 
+              "type": "exp"
+            }
+          ], 
+          "type": "lambda", 
+          "arguments": []
+        }
+      }, 
+      {
+        "type": "print", 
+        "value": {
+          "function": {
+            "type": "id", 
+            "name": "f"
+          }, 
+          "type": "call", 
+          "arguments": []
+        }
+      }
+    ]
+  }
+}
+
 def m = lambda (a,b) {a + b}
 
 text {
