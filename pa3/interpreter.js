@@ -12,6 +12,7 @@ if (typeof(module) !== 'undefined') {
   var envLookup = env.lookup;
 }
 var lo = console.log.bind(console)
+var j = JSON.stringify
 var interpret = function(asts, log, err) {
 
   var root = envRoot();
@@ -145,13 +146,34 @@ var interpret = function(asts, log, err) {
         return node.value;
       case "string-lit":
         return node.value;
+      case "len":
+        var table = evalExpression(node.dict, env)
+        return table.get_length()
+        
       case "empty-dict-lit":
         return new Table()
+      case "type":
+        // if (node.)
+        // lo('type ',node)
+        var obj = evalExpression(node.body, env);
+        if(obj instanceof Table){
+          return "table";
+        }
+        return "other";
+      case "in":
+        var key = evalExpression(node.operand1, env)
+        var table = evalExpression(node.operand2, env)
+        if (table.has_key(key)){
+          return 1
+        } else {
+          return 0
+        }
+
       case "get":
-        lo('ger env ', env, node)
+      lo('ger env ', env, node)
         var table = evalExpression(node.dict, env)
         lo('ok jb')
-        var field = evalExpression(node.field)
+        var field = evalExpression(node.field, env)
         var res = table.get(field)        
         lo('res  ',res)
         return res
@@ -171,13 +193,22 @@ var interpret = function(asts, log, err) {
         console.log('lambda make closure ', JSON.stringify(node))
         return makeClosure(node.arguments, node.body, env);
       case "call":
+        lo('call node', node)
+        if (node.function.name == 'type') {
+          var asts = {
+            body: node.arguments[0],
+            type:'type',
+          }
+          return evalExpression(asts, env)
+        }
         var fn = evalExpression(node.function, env);
+                
+        console.log('call fn  ',fn, 'node  ', node)
         if (fn.type && fn.type === 'closure') {
           // TODO: Perform a call. The code below will only work if there are
           // no arguments, so you'll have to fix it.  The crucial steps are:
           // 1. Extend the environment with a new frame --- see environment.js.
           // 2. Add argument bindings to the new frame.
-          console.log('call fn  ',fn, 'node  ', node)
           
           var newEnv = envExtend(fn.env)
           if (node.arguments.length == fn.names.length){
@@ -192,7 +223,7 @@ var interpret = function(asts, log, err) {
           throw new ExecError('Trying to call non-lambda');
         }
       default:
-        console.log('not match op', node, '  ', node.type)
+        console.log('not match op expression', j(node))
         throw new Error(
           "What's " + node.type + "? " + JSON.stringify(node)
       );

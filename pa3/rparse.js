@@ -6,7 +6,7 @@ if (typeof(module) !== 'undefined') {
   var http = require('http');
   var ParseError = require('./errors.js').ParseError;
 }
-
+var lo = console.log.bind(console)
 var rparse = function(inputArray, callback) {
   var inputs = [];
   
@@ -109,6 +109,7 @@ var rparse = function(inputArray, callback) {
     var trees = [];
     for (var i=0; i<inputArray.length; i++){
       var input = inputArray[i];
+      lo('i want input ', input)
       var result = JSON.parse(localStorage.getItem(input));
       
       // value contains the parse tree
@@ -125,7 +126,8 @@ var rparse = function(inputArray, callback) {
     // console.log('tree  ', tree)
     for (var t of trees)
     {
-      console.log('trees  ', JSON.stringify(t))
+      for (var tt of t)
+      console.log('trees  ', JSON.stringify(tt), tt)
     }
     
     

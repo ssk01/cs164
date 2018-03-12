@@ -3,4 +3,49 @@ To test your interpreter, you will have to write program in our cs164a language.
     3 on lexical scoping
     3 on function calls with parameters
     5 on syntactic sugar rewriting + any/all of the above.
+
+_____________________________________
+var lo = console.log.bind(console)
+_____________________________________
+
+
 {"dict":{"type":"id","name":"Object"},"type":"put","value":{"body":[],"type":"lambda","arguments":[{"type":"id","name":"self"},{"type":"id","name":"obj"}]},"field":{"type":"string-lit","value":"new"}}
+def a ={b=1,c =2}
+print a["b"]    
+
+
+————————————————————————————————————————
+def a = {x = 0, foobar = 1 + 2} 
+
+print a["x"]
+print a.foobar
+print ("z" in a)
+print a["z"]
+
+
+def lst = {}
+lst[0] = 1
+lst[2] = 3
+lst['Hello'] = 'world'
+print lst[0]
+print lst['Hello']
+print len(lst)
+_____________________________________
+def l = {}
+l[0] =3
+l[1]=4
+l[2]=5
+def getIterator_(list) {
+    # 0-1 because we currently don't support unary minus
+    def i = 0-1
+    lambda() {
+         i = i + 1
+         #print i
+         if (i < len(list)) { list[i]
+         } else { null } # terminates iteration
+    } 
+}
+print len(l)
+def b = getIterator_(l)
+print 'wtf'
+print b()

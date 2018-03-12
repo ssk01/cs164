@@ -60,7 +60,7 @@ if (typeof(module) !== 'undefined') {
     // TODO: Lookup the value of "name" in "env" in the current and previous frames
     f = frame
     if (frame.hasOwnProperty(name)) {
-      console.log('frame father ',name,frame[name])
+      // console.log('frame father ',name,frame[name])
       
       return frame[name];
     } else {

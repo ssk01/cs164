@@ -16,8 +16,16 @@ var desugarAST = (function() {
     "example": "def %u1 = %nodeattribute",
     "if": " ite(%condition,lambda(){%true}, lambda(){%false}  )()",
     "while":"lambda(){def %u1 = lambda(cond, b){ite(cond(), lambda(){b(); %u1(cond,b)},lambda(){})();}; %u1(lambda(){%condition},lambda(){ %body})}()",
-    // "while":
-    "for": "lambda(){def %u2 = %iterable; def %name = %u2(); while(%name !=null){lambda(%name){%body}(%name);%name=%u2()}}()"
+    "for": "lambda(){def %u2 = null; def %u3 = %iterable;"+
+    "if(type(%u3)=='table'){%u2=_getIterator_(%u3);}else{%u2=%u3};"+
+        "def %name = %u2();"+
+  "while(%name!=null) {lambda(%name){%body}(%name); %name = %u2();}}()",
+
+
+  // "for": "lambda(){def %u2 = %iterable;" + 
+    // "def %u3 = null;"+
+    // "if (type(%u2) == 'table') {%u3 = _getIterator_(%u2);} else {%u3=%u2};"+
+    // " def %name = %u3(); print 'name'; print %name;while(%name !=null){lambda(%name){%body}(%name);%name=%u3()}}()"
     //  "(lambda(%u1, %u2){def %u3 = %u1() if (%u3){ %u2()}if (%u3){ %u3(%u1, %u2) } } )(lambda(){%condition}, lambda(){%body})" 
    
   };
