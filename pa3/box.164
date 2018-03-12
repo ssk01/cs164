@@ -1,0 +1,44 @@
+##
+# Box: The superclass of VBox and HBox, both of which share how
+# they're rendered and traversed
+#
+def Box = Object:new({ \
+  x=0, y=0, width=0, height=0, color="black", weight = 0, weight2 = 0, opacityValue = 0, maxOpacityValue = 0, text="" \
+})
+
+##
+# Box instances each have their own list of children.
+#
+Box.new = lambda(self, obj) {
+  obj = Object.new(self, obj)
+  if (not("children" in obj)) { obj.children = {} }
+  obj
+}
+
+Box.visitInPreorder = lambda(self,f) {
+  # TODO: implement me!
+}
+
+Box.visitInPostorder = lambda(self,f) {
+  # TODO: implement me!
+}
+
+Box.addChild = lambda(self, child) {
+  append(self.children, child)
+  child.parent = self
+  self
+}
+
+Box.pass1_ComputeWeightAndColor = lambda(self) {
+  # TODO: implement me!
+  # Right now, this pass only propogates weight.  What else
+  # should it do?
+
+  for (child in self.children) {
+    self.weight = self.weight + child.weight
+  }
+}
+
+Box.pass3_Render = lambda(self) {
+  # TODO: implement me!
+}

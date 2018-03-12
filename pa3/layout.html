@@ -1,0 +1,108 @@
+<!-- python -m CGIHTTPServer -->
+<!-- <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> -->
+<html>
+<head>
+
+<script charset="utf-8" src="jquery-1.11.1.js"></script>
+<script charset="utf-8" src="runtime.js"></script>
+<script charset="utf-8" src="errors.js"></script>
+<script charset="utf-8" src="environment.js"></script>
+<script charset="utf-8" src="rparse.js"></script>
+<script charset="utf-8" src="desugar.js"></script>
+<script charset="urf-8" src="table.js"></script>
+<script charset="utf-8" src="interpreter.js"></script>
+
+<style>
+body {
+    font-family: sans-serif;
+    margin:0px;
+    padding:0px;
+}
+* {
+    box-sizing: border-box;
+}
+#eval {
+    width: 100%;
+    height: 150px;
+    font-family: monospace;
+    display: none;
+}
+#go {
+    width: 100%;
+}
+#output {
+    padding-left: 10px;
+}
+#eval:focus {
+    outline: none;
+}
+.frame {
+    border-style: solid;
+    border-width: 1px;
+    border-color: gray;
+    border-collapse: collapse;
+    margin: 5px;
+}
+.frame td, .frame th {
+    border: solid 1px gray;
+    padding: 5px;
+}
+tr td:first-child {
+    background-color: #eee;
+}
+td {
+    font-family: monospace;
+}
+th {
+    font-size: 11px;
+    color: #666;
+}
+</style>
+
+<script charset="utf-8">
+window.onload = function(){
+  
+  // readStringFromFileAtPath function adapted from 
+  // http://thiscouldbebetter.wordpress.com/2013/01/31/reading-a-string-from-a-file-in-javascript/
+  function readStringFromFileAtPath(filePath){
+    var request = new XMLHttpRequest();
+	  request.open("GET", filePath, false);
+	  request.send(null);
+	  return request.responseText;
+  }
+
+  function runLayout() {
+    var srcFiles = ["library.164", "object.164","box.164","vbox.164",
+        "hbox.164","layout.164", "small_input.164"];
+	  var srcs = [];
+    for (var i in srcFiles){
+        srcs.push(readStringFromFileAtPath(srcFiles[i]));
+    }
+	  
+	  var out = document.getElementById("out");
+	  while (out.firstChild) {
+	  	out.removeChild(out.firstChild);
+	  }
+	  
+	  rparse(srcs, function(input_asts) {
+	    interpret(input_asts, function(x) {
+	  	  out.innerText += x + "\n";
+	    });
+	  });
+  }
+  document.getElementById("go").onclick = runLayout;
+  runLayout();
+}
+</script>
+</head>
+
+<body>
+  <div id="input">
+    <button id="go">Go!</button>
+  </div>  
+  <div id="output">
+    <h1>output</h1>
+    <pre id="out"></pre>
+  </div>
+</body>
+</html>

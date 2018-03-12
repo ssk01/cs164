@@ -1,0 +1,32 @@
+def False = 0
+def True = 1
+
+def not(b) {if (b) {False} else {True}}
+def max(x,y) { if (x>y) { x } else { y } }
+
+# Return an iterator for a list
+# list is a dictionary
+# this iterator iterates over keys 0 .. len(list)-1
+# If want, you can use that function when desugaring for.
+def _getIterator_(list) {
+    # 0-1 because we currently don't support unary minus
+    def i = 0-1
+    lambda() {
+         i = i + 1
+         if (i < len(list)) { list[i]
+         } else { null } # terminates iteration
+    } 
+}
+    
+# append o to list; return the list
+def append(list,o) {
+    list[len(list)]=o
+}
+
+# Metatables
+def setmetatable(o,t) {
+    o.__mt = t
+} 
+def getmetatable(o) {
+    o.__mt
+}

@@ -1,0 +1,142 @@
+def global = HBox:new(null)
+global.x = 0
+global.y = 0
+global.width = js getCanvasWidth()
+global.height = js getCanvasHeight()
+
+global.text = "Global"
+global.weight = 0
+global.weight2 = 0
+def america = VBox:new(null)
+america.text = "America"
+america.weight = 0
+america.weight2 = 0
+global:addChild(america)
+def brazil = HBox:new(null)
+brazil.text = "Brazil"
+brazil.weight = 11
+brazil.weight2 = 10
+america:addChild(brazil)
+def usa = HBox:new(null)
+usa.text = "USA"
+usa.weight = 52
+usa.weight2 = 31
+america:addChild(usa)
+def mexico = HBox:new(null)
+mexico.text = "Mexico"
+mexico.weight = 24
+mexico.weight2 = 12
+america:addChild(mexico)
+def canada = HBox:new(null)
+canada.text = "Canada"
+canada.weight = 16
+canada.weight2 = -23
+america:addChild(canada)
+def europe = VBox:new(null)
+europe.text = "Europe"
+europe.weight = 0
+europe.weight2 = 0
+global:addChild(europe)
+def france = HBox:new(null)
+france.text = "France"
+france.weight = 42
+france.weight2 = -11
+europe:addChild(france)
+def germany = HBox:new(null)
+germany.text = "Germany"
+germany.weight = 31
+germany.weight2 = -2
+europe:addChild(germany)
+def sweden = HBox:new(null)
+sweden.text = "Sweden"
+sweden.weight = 22
+sweden.weight2 = -13
+europe:addChild(sweden)
+def italy = HBox:new(null)
+italy.text = "Italy"
+italy.weight = 17
+italy.weight2 = 4
+europe:addChild(italy)
+def uk = HBox:new(null)
+uk.text = "UK"
+uk.weight = 21
+uk.weight2 = -5
+europe:addChild(uk)
+def asia = VBox:new(null)
+asia.text = "Asia"
+asia.weight = 0
+asia.weight2 = 0
+global:addChild(asia)
+def china = HBox:new(null)
+china.text = "China"
+china.weight = 36
+china.weight2 = 4
+asia:addChild(china)
+def japan = HBox:new(null)
+japan.text = "Japan"
+japan.weight = 20
+japan.weight2 = -12
+asia:addChild(japan)
+def india = HBox:new(null)
+india.text = "India"
+india.weight = 40
+india.weight2 = 63
+asia:addChild(india)
+def laos = HBox:new(null)
+laos.text = "Laos"
+laos.weight = 4
+laos.weight2 = 34
+asia:addChild(laos)
+def mongolia = HBox:new(null)
+mongolia.text = "Mongolia"
+mongolia.weight = 1
+mongolia.weight2 = -5
+asia:addChild(mongolia)
+def israel = HBox:new(null)
+israel.text = "Israel"
+israel.weight = 12
+israel.weight2 = 24
+asia:addChild(israel)
+def iran = HBox:new(null)
+iran.text = "Iran"
+iran.weight = 18
+iran.weight2 = 13
+asia:addChild(iran)
+def pakistan = HBox:new(null)
+pakistan.text = "Pakistan"
+pakistan.weight = 11
+pakistan.weight2 = -52
+asia:addChild(pakistan)
+def africa = VBox:new(null)
+africa.text = "Africa"
+africa.weight = 0
+africa.weight2 = 0
+global:addChild(africa)
+def egypt = HBox:new(null)
+egypt.text = "Egypt"
+egypt.weight = 21
+egypt.weight2 = 0
+africa:addChild(egypt)
+def s_africa = HBox:new(null)
+s_africa.text = "S_Africa"
+s_africa.weight = 30
+s_africa.weight2 = 43
+africa:addChild(s_africa)
+def sudan = HBox:new(null)
+sudan.text = "Sudan"
+sudan.weight = 12
+sudan.weight2 = 2
+africa:addChild(sudan)
+def congo = HBox:new(null)
+congo.text = "Congo"
+congo.weight = 10
+congo.weight2 = 12
+africa:addChild(congo)
+def zaire = HBox:new(null)
+zaire.text = "Zaire"
+zaire.weight = 8
+zaire.weight2 = 10
+africa:addChild(zaire)
+
+js reset()
+layout(global)

@@ -1,0 +1,10 @@
+##
+# HBox: A box that lays out its children horizontally
+#
+def HBox = Box:new({})
+
+HBox.pass2 = lambda(self) {
+  # TODO: What should be computed in this pass?
+  # give this pass a more informative name, and complete all necessary
+  # computation
+}
