@@ -26,7 +26,7 @@ def append(list,o) {
 # Metatables
 def setmetatable(o,t) {
     o.__mt = t
-} 
+}   
 def getmetatable(o) {
     o.__mt
 }

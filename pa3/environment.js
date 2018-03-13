@@ -67,7 +67,7 @@ if (typeof(module) !== 'undefined') {
       frame = frame['*parent']
       while (frame != null) {
         if (frame.hasOwnProperty(name)) {
-          console.log('frame father ',name,frame[name])
+          console.log('frame father ', name, frame, frame[name])
           return frame[name];
         }
         frame = frame['*parent']

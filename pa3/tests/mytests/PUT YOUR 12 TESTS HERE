@@ -4,11 +4,41 @@ To test your interpreter, you will have to write program in our cs164a language.
     3 on function calls with parameters
     5 on syntactic sugar rewriting + any/all of the above.
 
+
+_____________________________________
+i want input  def x = Object:new({k = 311})
+print x.k
+rparse.js:112:7
+trees   {"type":"def","name":
+{"type":"id","name":"x"},
+"value":{"obj":{"type":"id","name":"Object"},
+"args":[{"type":"dict-lit","value":[{"name":"k","value":{"type":"int-lit","value":311}}]}],
+"type":"mcall","mname":{"type":"id","name":"new"}}}
 _____________________________________
 var lo = console.log.bind(console)
 _____________________________________
 
+def x = Object:new({k = 3})
+def y = x:new({})
+print y.k
+————————————————————————————————————————————————
+def x = Object:new({})
+x.print_three = lambda(self) {
+    print self.three
+}
+def y = x:new({})
+def k = y:new({three = 3})
+k:print_three()
+_____________________________________
+def test() {
+    print "Fail"
+    1
+}
 
+if (1 || test()) {
+    print "Done"
+}
+_____________________________________
 {"dict":{"type":"id","name":"Object"},"type":"put","value":{"body":[],"type":"lambda","arguments":[{"type":"id","name":"self"},{"type":"id","name":"obj"}]},"field":{"type":"string-lit","value":"new"}}
 def a ={b=1,c =2}
 print a["b"]    

@@ -24,6 +24,10 @@ var desugarAST = (function() {
     //   "comprehension": "lambda(){"+
     //       "def %u1={}; def %u2=0; for(%name in %iterable){%u1[%u2]=lambda(%name){%expression}(%name); %u2=%u2+1;}; %u1;"+
     //  "}()"
+    "||":"lambda(){ if (%operand1){1} else {"+
+          " if (%operand2) {1} else {0}"+
+          "}  }()",
+    "&&": "lambda(){ if(%operand1){ if(%operand2){1}else {0}} else {0} }()",
   "comprehension":" lambda(){def %u5 = _getIterator_(%iterable);"+
                   "def %name = %u5();"+
                   "def %u6 ={}; def %u7 = 0;"+
@@ -196,6 +200,8 @@ var desugarAST = (function() {
         },
         'arguments': []
       });
+      lo('1234mcall obj, ', node.obj, node.mname, dArgs, node)
+      
       return res;
     } else if (node.type === 'dict-lit') {
       var asgns = [];

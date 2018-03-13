@@ -44,20 +44,24 @@ Table.prototype.get = function(key) {
   if (typeof key == "number") {
     if (key in this.int_dict) {
       return this.int_dict[key]
-    } else {
-      throw new ExecError("tried to get nonexistent key: "+ key)
     }
+  } else if (key in this.table) {
+    return this.table[key]
   } else {
-    if (key in this.table) {
-      return this.table[key]
-    } else {
-      throw new ExecError("tried to get nonexistent key: "+ key)
-    }
+    if ('__mt' in this.table) {
+      var mt = this.table.__mt 
+      lo("mt ",mt, typeof mt)
+      if ('__index' in mt.table) {
+        return mt.get(key)
+      }
+      lo('fuck no index')
+    } 
+    throw new ExecError("tried to get nonexistent key: "+ key)
   }
 };
 
 Table.prototype.toString = function() {
-
+   lo("tostring ",JSON.stringify(this.table))
 };
 
 Table.prototype.get_length = function() {

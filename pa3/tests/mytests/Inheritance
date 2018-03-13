@@ -1,0 +1,104 @@
+def x = Object:new({k = 3})
+def y = x:new({})
+print y.k
+_____________________
+def x = Object:new({})
+x.print_three = lambda(self) {
+    self.three = self.three - 3
+}
+def y = x:new({})
+def k = y:new({three = 3})
+k:print_three()
+print k.three
+_____________________
+def x = Object:new({three = 3})
+x.print_three = lambda(self) {
+    self.three = self.three - 3
+}
+def k = x:new({})
+print k.three
+print x.three
+k:print_three()
+print k.three
+print x.three
+————————————————————————————————————————
+# p1
+def food = Object:new({amount = 5})
+food.eat = lambda() {
+    food.amount = food.amount - 1
+}
+def f1 = food:new({})
+print f1.amount
+f1.eat()
+print f1.amount
+def f2 = food:new({})
+print f2.amount
+food = null
+print f2.amount
+f2.eat()
+print f2.amount
+_______________________________________
+# p2
+def Food = {amount = 5}
+def f1 = Food
+def Food.eat = lambda(self) {
+    self.amount = self.amount - 1
+}
+print f1.amount
+f1:eat()
+print f1.amount
+print Food.amount
+————————————————————————————————————————
+# p3
+def food = Object:new({amount = 5})
+food.eat = lambda(self) {
+    self.amount = self.amount - 1
+}
+def f1 = food:new({})
+print f1.amount
+f1:eat()
+print f1.amount
+print 'food'
+print food.amount
+def f2 = food:new({})
+print f2.amount
+food = null
+print f2.amount
+f2:eat()
+print f2.amount
+
+_____________________
+#p4
+def lays = Object:new({a = 5})
+Object.eat = lambda(self) {
+    self.a = self.a - 1
+}
+def alice = lays:new({})
+print alice.a
+alice:eat()
+print alice.a
+print '____________'
+lays.eat = lambda(self) {
+    self.a = self.a - 2
+}
+def bob = lays:new({})
+print bob.a
+bob:eat()
+print bob.a
+print '____________'
+
+print alice.a
+alice:eat()
+print alice.a
+print '____________'
+bob.eat = lambda(self) {
+    self.a  =self.a - 3
+}
+print bob.a
+bob:eat()
+print bob.a 
+print '____________'
+print alice.a
+aliceChips:eat()
+print alice.a
+print '____________'

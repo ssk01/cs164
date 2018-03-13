@@ -11,5 +11,11 @@
 def Object = {}
 
 Object.new = lambda(self, obj) {
+    if (obj == null) {
+        obj = {}
+    }
+    setmetatable(obj, self)
+    self.__index = self
+    obj
 }
 

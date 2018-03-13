@@ -140,17 +140,6 @@ var interpret = function(asts, log, err) {
         } else {
             return 0
         };
-      case "||":
-        var op1 = evalExpression(node.operand1, env)
-        if (op1){
-          return 1
-        } else {
-          var op2 = evalExpression(node.operand2, env)
-          if (op2) {
-            return 1
-          }
-          return 0
-        }
       case "id":
         return envLookup(env, node.name);
       case "null":
@@ -185,7 +174,10 @@ var interpret = function(asts, log, err) {
       case "get":
       lo('ger env ', env, node)
         var table = evalExpression(node.dict, env)
-        lo('ok jb')
+        if (!(table instanceof Table)) {
+          log('table is null')
+          return null
+        }
         var field = evalExpression(node.field, env)
         var res = table.get(field)        
         lo('res  ',res)
@@ -203,7 +195,7 @@ var interpret = function(asts, log, err) {
         console.log('cond, ', node.condition,cond)
         return cond ? ct : cf;
       case "lambda":
-        console.log('lambda make closure ', JSON.stringify(node))
+        // console.log('lambda make closure ', JSON.stringify(node))
         return makeClosure(node.arguments, node.body, env);
       case "call":
         lo('call node', node)
@@ -225,12 +217,16 @@ var interpret = function(asts, log, err) {
           
           var newEnv = envExtend(fn.env)
           if (node.arguments.length == fn.names.length){
-            console.log('ok  jb', )
+            // console.log('ok  jb', )
             for (var i = 0; i < node.arguments.length; i++){
               envBind(newEnv,  fn.names[i].name, evalExpression(node.arguments[i], env))
             }
+          } else {
+            console.log('ok no jb', )
+            log('arguments lens is error')
+            return
           }
-          console.log('new env here ', newEnv)
+          // console.log('new env here ', newEnv)
           return evalBlock(fn.body, newEnv);
         } else {
           throw new ExecError('Trying to call non-lambda');
@@ -255,12 +251,16 @@ var interpret = function(asts, log, err) {
     switch (node.type) {
       case "def":
       envBind(env, node.name.name, evalExpression(node.value, env));
-      console.log('def  .',node.name.name)
+      // console.log('def  .',node.name.name)
       return null;
     case "put":
         lo('put env ', env, node)
         var table = evalExpression(node.dict, env)
-        lo('ok jb')
+        if (!(table instanceof Table)) {
+          log('table is null')
+          return null
+        }
+        // lo('ok jb')
         var field = evalExpression(node.field, env)
         var value = evalExpression(node.value, env)
         table.put(field, value)
