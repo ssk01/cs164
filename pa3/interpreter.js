@@ -61,7 +61,9 @@ var interpret = function(asts, log, err) {
 
   function evalBlock(t, env) {
     var last = null;
+    lo('after desugar ', j(t),t)
     t.forEach(function(n) {
+      
       last = evalStatement(n, env);
     });
     return last;
@@ -138,6 +140,17 @@ var interpret = function(asts, log, err) {
         } else {
             return 0
         };
+      case "||":
+        var op1 = evalExpression(node.operand1, env)
+        if (op1){
+          return 1
+        } else {
+          var op2 = evalExpression(node.operand2, env)
+          if (op2) {
+            return 1
+          }
+          return 0
+        }
       case "id":
         return envLookup(env, node.name);
       case "null":
@@ -223,7 +236,12 @@ var interpret = function(asts, log, err) {
           throw new ExecError('Trying to call non-lambda');
         }
       default:
-        console.log('not match op expression', j(node))
+        console.log('not match op expression', j(node), node)
+        if (node.type == 'exp'){
+          lo('what fuck about exp')
+          return evalStatement(node, env)
+          // return
+        }
         throw new Error(
           "What's " + node.type + "? " + JSON.stringify(node)
       );
