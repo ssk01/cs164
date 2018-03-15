@@ -4,7 +4,8 @@ if (typeof(module) !== 'undefined') {
 
 // TODO: Use Table to implement dictionaries, lists, and objects
 // Complete all the requisite methods below
-var lo = console.log.bind(console)
+// var lo = console.log.bind(console)
+var lo = function(){}
 function Table() {
   this.table = {}
   this.int_dict = {}
@@ -56,12 +57,12 @@ Table.prototype.get = function(key) {
       }
       lo('fuck no index')
     } 
-    throw new ExecError("tried to get nonexistent key: "+ key)
+    throw new ExecError("tried to get nonexistent key: "+this.toString()+"  "+ key)
   }
 };
 
 Table.prototype.toString = function() {
-   lo("tostring ",JSON.stringify(this.table))
+  //  lo("tostring ",JSON.stringify(this.table))
 };
 
 Table.prototype.get_length = function() {

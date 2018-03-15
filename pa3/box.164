@@ -17,10 +17,19 @@ Box.new = lambda(self, obj) {
 
 Box.visitInPreorder = lambda(self,f) {
   # TODO: implement me!
+  print self.text
+  f(self)
+  for (child in self.children) {
+    child:visitInPreorder(f)
+ }
 }
 
 Box.visitInPostorder = lambda(self,f) {
   # TODO: implement me!
+  for (child in self.children) {
+    child:visitInPostorder(f)
+  }
+  f(self)
 }
 
 Box.addChild = lambda(self, child) {
@@ -33,12 +42,29 @@ Box.pass1_ComputeWeightAndColor = lambda(self) {
   # TODO: implement me!
   # Right now, this pass only propogates weight.  What else
   # should it do?
-
+  self.color = 'green'
+  if (self.weight2 < 0) {
+    self.color = "red"
+    self.weight2 = - 1 * self.weight2
+  }
+  self.opacityValue = self.weight2
+  self.maxOpacityValue = self.opacityValue
   for (child in self.children) {
     self.weight = self.weight + child.weight
+    self.maxOpacityValue = max(self.maxOpacityValue, child.maxOpacityValue)
+
+  }
+}
+
+Box.pass3_draw = lambda(self) {
+  self:pass3_Render()
+  if (len(self.children) == 0) {
+    js drawText(self.x, self.y + self.height, self.text, 10)
   }
 }
 
 Box.pass3_Render = lambda(self) {
   # TODO: implement me!
+  js drawBox(self.x, self.y, self.width, self.height,self.color, self.opacityValue,self.maxOpacityValue)
+  #1,1)
 }

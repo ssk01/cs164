@@ -5,6 +5,10 @@ $(document).ready(function() {
 });
 
 var runtime = {
+  log: function(c, m, w) {
+    console.log('get log ', c, m, w)
+    return 0
+  },
   drawBox: function _drawBox(x, y, width, height, fill, opacity, maxOpacity, text) {
     console.log('draw box', x, y, width, height, fill, opacity, maxOpacity);
     var box = $(document.createElementNS('http://www.w3.org/2000/svg', 'rect'))

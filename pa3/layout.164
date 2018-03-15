@@ -4,5 +4,8 @@
 
 def layout(root) {
   root:visitInPostorder(lambda(box){box:pass1_ComputeWeightAndColor()})
+  root:visitInPreorder(lambda(box){box:pass2_ComputeXYAndMaxOpacityValue()})
+  root:visitInPreorder(lambda(box){box:pass3_draw()})
+  #root:pass3_Render()
   # TODO: write the remaining passes
 }

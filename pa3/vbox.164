@@ -1,4 +1,20 @@
 ##
 # VBox: A box that stacks its children vertically.
 #
-
+def VBox = Box:new({})
+VBox.pass2_ComputeXYAndMaxOpacityValue=lambda(self) {
+  print 'vbox fuck'
+  self.maxOpacityValue = self.parent.maxOpacityValue
+  self.height = self.parent.height
+  self.y = self.parent.y
+  self.width = self.weight / self.parent.weight * self.parent.width 
+  self.x = self.parent.x
+  def unfind = 1
+  for (coursin in self.parent.children) {
+    if (unfind && coursin != self) {
+      self.x = self.x + coursin.width
+    } else {
+      unfind = 0
+    }
+  }
+}

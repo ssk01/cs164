@@ -29,7 +29,7 @@ if (typeof(module) !== 'undefined') {
           var out = document.getElementById("out");
       throw new ExecError("is already declared")
       } 
-      console.log('envbind ', name, value)
+      // console.log('envbind ', name, value)
       frame[name] = value
       // Error: x is already declared
       // throw "Implement me!";
@@ -67,7 +67,7 @@ if (typeof(module) !== 'undefined') {
       frame = frame['*parent']
       while (frame != null) {
         if (frame.hasOwnProperty(name)) {
-          console.log('frame father ', name, frame, frame[name])
+          // console.log('frame father ', name, frame, frame[name])
           return frame[name];
         }
         frame = frame['*parent']

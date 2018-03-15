@@ -5,7 +5,8 @@ if (typeof(module) !== 'undefined') {
   var rparse = require('./rparse.js').rparse;
   var DesugarError = require('./errors.js').DesugarError;
 }
-var lo = console.log.bind(console)
+// var lo = console.log.bind(console)
+var lo = function(){}
 
 // produce a lexical scope using function scoping
 // http://en.wikipedia.org/wiki/Immediately-invoked_function_expression

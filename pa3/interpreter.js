@@ -11,7 +11,9 @@ if (typeof(module) !== 'undefined') {
   var envUpdate = env.update;
   var envLookup = env.lookup;
 }
-var lo = console.log.bind(console)
+// var lo = console.log.bind(console)
+var lo = function(){}
+
 var j = JSON.stringify
 var interpret = function(asts, log, err) {
 
@@ -192,7 +194,7 @@ var interpret = function(asts, log, err) {
         if ((typeof cond != 'boolean') && (typeof cond != 'number')) {
           throw new ExecError('Condition not a boolean');
         }
-        console.log('cond, ', node.condition,cond)
+        // console.log('cond, ', node.condition,cond)
         return cond ? ct : cf;
       case "lambda":
         // console.log('lambda make closure ', JSON.stringify(node))
@@ -208,7 +210,7 @@ var interpret = function(asts, log, err) {
         }
         var fn = evalExpression(node.function, env);
                 
-        console.log('call fn  ',fn, 'node  ', node)
+        // console.log('call fn  ',fn, 'node  ', node)
         if (fn.type && fn.type === 'closure') {
           // TODO: Perform a call. The code below will only work if there are
           // no arguments, so you'll have to fix it.  The crucial steps are:

@@ -99,6 +99,6 @@ bob:eat()
 print bob.a 
 print '____________'
 print alice.a
-aliceChips:eat()
+alice:eat()
 print alice.a
 print '____________'

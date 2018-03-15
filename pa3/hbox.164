@@ -3,8 +3,24 @@
 #
 def HBox = Box:new({})
 
-HBox.pass2 = lambda(self) {
+HBox.pass2_ComputeXYAndMaxOpacityValue = lambda(self) {
   # TODO: What should be computed in this pass?
   # give this pass a more informative name, and complete all necessary
   # computation
+  if ('parent' in self) {
+    self.maxOpacityValue = self.parent.maxOpacityValue
+    self.width = self.parent.width
+    self.x = self.parent.x
+    self.height = self.weight / self.parent.weight * self.parent.height 
+    self.y = self.parent.y
+    def unfind = 1
+    for (coursin in self.parent.children) {
+      if (unfind && coursin != self) {
+        self.y = self.y + coursin.height
+      } else {
+        unfind = 0
+      }
+    }
+  } 
+ 
 }
