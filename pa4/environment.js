@@ -58,10 +58,7 @@ if (typeof(module) !== 'undefined') {
   /* Looks up the value of a variable. */
   function envLookup(frame, name) {
     // TODO: Lookup the value of "name" in "env" in the current and previous frames
-    // f = frame
-    if (typeof frame != 'object') {
-        throw new ExecError('frame null or false arguments')
-    }
+    f = frame
     if (frame.hasOwnProperty(name)) {
       // console.log('frame father ',name,frame[name])
       

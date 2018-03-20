@@ -1,0 +1,21 @@
+## TODO: Make Object!
+#
+# The base class in our object hierarchy. All other classes must inherit from
+# the root Object class. Has two methods:
+# 
+# 1) new: A constructor-like method that implements prototype-based inheritance.
+# All Object instances as well as its subclasses are constructed with this
+# method. See http://www.lua.org/pil/16.2.html for details.
+#
+
+def Object = {}
+
+Object.new = lambda(self, obj) {
+    if (obj == null) {
+        obj = {}
+    }
+    setmetatable(obj, self)
+    self.__index = self
+    obj
+}
+
