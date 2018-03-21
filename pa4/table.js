@@ -63,6 +63,47 @@ Table.prototype.get = function(key) {
 
 Table.prototype.toString = function() {
   //  lo("tostring ",JSON.stringify(this.table))
+  var keys = Object.keys(this.table)
+  var res = 'table:{ '
+  console.log(typeof this.table, keys,keys.length)
+  for (var i = 0; i< keys.length; i++) {
+    var key = keys[i]
+    var value = this.table[key]
+    res = res + key + ': '
+    if (value instanceof Table ){
+      if (value==this ){
+        res += 'self'
+      } else{
+        res += value.toString()
+      }
+        // res += value.toString()
+    } else if (value.type == 'closure') {
+       res += 'closure'
+    } else {
+      res += value
+    }
+    res +=', '
+  }
+  var idxs = Object.keys(this.int_dict)
+  for (var i = 0; i < idxs.length; i++ ) {
+    var key = idxs[i]
+    var value = this.int_dict[key]
+    res = res + key + ': '
+    if (value instanceof Table ){
+      if (value==this ){
+        res += 'self'
+      } else{
+        res += value.toString()
+      }
+    } else if (value.type == 'closure') {
+       res += 'closure'
+    } else {
+      res += value
+    }
+    res +=', '
+  }
+  res +='} \n'
+  return res
 };
 
 Table.prototype.get_length = function() {

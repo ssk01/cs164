@@ -34,7 +34,13 @@ var interpret = function(asts, log, err) {
   function compileToBytecode(ast) {
     // TODO step 2: Complete this function, which takes an AST as input
     // and produces bytecode as its output
-	  
+	  function pushOp( node, btc,target) {
+      var reg1 = uniquegen()
+      expnode(node.operand1, reg1, btc)
+      var reg2 = uniquegen()
+      expnode(node.operand2, reg2, btc)
+      btc.push({"type":node.type,"operand1":reg1,"operand2":reg2,"target":target})
+    }
 
     uniquegen.counter = 1;
     function expnode(node, target, btc) {
@@ -42,59 +48,17 @@ var interpret = function(asts, log, err) {
         case 'int-lit':
           btc.push({"type":"int-lit","value":node.value,"target": target})
           break
-        case '+':
-          var reg1 = uniquegen()
-          expnode(node.operand1, reg1, btc)
-          var reg2 = uniquegen()
-          expnode(node.operand2, reg2, btc)
-          btc.push({"type":"+","operand1":reg1,"operand2":reg2,"target":target})
+        case 'string-lit':
+          btc.push({"type":"string-lit","value":node.value,"target": target})
           break
-        case '-':
-          var reg1 = uniquegen()
-          expnode(node.operand1, reg1, btc)
-          var reg2 = uniquegen()
-          expnode(node.operand2, reg2, btc)
-          btc.push({"type":"-","operand1":reg1,"operand2":reg2,"target":target})
+        case 'empty-dict-lit':
+          btc.push({"type":"empty-dict-lit","target": target})
           break
-        case '*':
-          var reg1 = uniquegen()
-          expnode(node.operand1, reg1, btc)
-          var reg2 = uniquegen()
-          expnode(node.operand2, reg2, btc)
-          btc.push({"type":"*","operand1":reg1,"operand2":reg2,"target":target})
+        case 'put':
           break
-        case '/':
-            var reg1 = uniquegen()
-            expnode(node.operand1, reg1, btc)
-            var reg2 = uniquegen()
-            expnode(node.operand2, reg2, btc)
-            btc.push({"type":"/","operand1":reg1,"operand2":reg2,"target":target})
-        case '>':
-          var reg1 = uniquegen()
-          expnode(node.operand1, reg1, btc)
-          var reg2 = uniquegen()
-          expnode(node.operand2, reg2, btc)
-          btc.push({"type":">","operand1":reg1,"operand2":reg2,"target":target})
-          break
-        case '<':
-          var reg1 = uniquegen()
-          expnode(node.operand1, reg1, btc)
-          var reg2 = uniquegen()
-          expnode(node.operand2, reg2, btc)
-          btc.push({"type":"<","operand1":reg1,"operand2":reg2,"target":target})
-          break
-        case '==':
-          var reg1 = uniquegen()
-          expnode(node.operand1, reg1, btc)
-          var reg2 = uniquegen()
-          expnode(node.operand2, reg2, btc)
-          btc.push({"type":"==","operand1":reg1,"operand2":reg2,"target":target})
-        case '!=':
-          var reg1 = uniquegen()
-          expnode(node.operand1, reg1, btc)
-          var reg2 = uniquegen()
-          expnode(node.operand2, reg2, btc)
-          btc.push({"type":"!=","operand1":reg1,"operand2":reg2,"target":target})
+        case 'exp':
+          expnode(node.body, target, btc)
+          //not sure
           break
         case 'id':
           btc.push({"type":"id","name":node.name ,"target":target})
@@ -135,6 +99,11 @@ var interpret = function(asts, log, err) {
           lo('call node ', j(code))
           break
         default:
+          var op =['+', '-', '*', '/','==','!=','>','<','>=', '<=']
+          if (op.indexOf(node.type) != -1 ){
+            pushOp(node, btc, target)
+            break
+          }
           lo('default expnode error', node)
           throw new ExecError('wtfff ')
       }
@@ -155,6 +124,15 @@ var interpret = function(asts, log, err) {
             // expnode(node.body, target)
             btc.push({"type":"def","name":node.name.name,"value": value, "target":target})
             break
+        case 'put':
+          var reg1 = uniquegen()
+          expnode(node.dict, reg1, btc)
+          var reg2 = uniquegen()
+          expnode(node.field, reg2, btc)
+          var reg3 = uniquegen()
+          expnode(node.value, reg3, btc)
+          btc.push({"type":"put","dict":reg1,"value": reg3,"field": reg2, "target":target})
+          break
         case 'print':
             //         {"type":"print","value":"#btc-reg-13","target":"#btc-reg-12"},
             // {"type":"return","value":"#btc-reg-12"}] 
@@ -267,7 +245,42 @@ var interpret = function(asts, log, err) {
     ps.callStack.push(frame)
     return ps
   }
-
+  function bindOpresult(ins, env) {
+    var lhs = envLookup(env, ins.operand1)
+    var rhs = envLookup(env, ins.operand2)
+    var result = 0
+    if (ins.type == '+') {
+      result = lhs+rhs
+    }
+    else if (ins.type == '-') {
+      result = lhs-rhs
+    }
+    else if (ins.type == '*') {
+      result = lhs*rhs
+    }
+    else if (ins.type == '/') {
+      result = lhs/rhs
+    }
+    else if (ins.type == '==') {
+      result = (lhs==rhs)
+    }
+    else if (ins.type == '!=') {
+      result = (lhs!=rhs)
+    }
+    else if (ins.type == '>') {
+    result = (lhs>rhs)
+    }
+    else if (ins.type == '<') {
+      result = (lhs<rhs)
+    }
+    else if (ins.type == '>=') {
+    result = (lhs>=rhs)
+    }
+    else if (ins.type == '<=') {
+      result = (lhs<=rhs)
+    }
+    envBind(env, ins.target, result)
+  }
   function resumeProgram(programState, log) {
     // TODO step 3: implement this function, which executes
     // bytecode.  See how it's called in the execBytecode function.
@@ -284,52 +297,30 @@ var interpret = function(asts, log, err) {
       }
       var ins = btc[frame['pc']]
       switch(ins.type) {
-        case '+':
-          var lhs = envLookup(env, ins.operand1)
-          var rhs = envLookup(env, ins.operand2)
-          envBind(env, ins.target, lhs+rhs)
-          lo('+ result', lhs , rhs)
+        case 'int-lit':
+          envBind(env, ins.target, ins.value)
           break
-        case '-':
-          var lhs = envLookup(env, ins.operand1)
-          var rhs = envLookup(env, ins.operand2)
-          envBind(env, ins.target, lhs-rhs)
+        case 'string-lit':
+          envBind(env, ins.target, ins.value)
           break
-        case '*':
-          var lhs = envLookup(env, ins.operand1)
-          var rhs = envLookup(env, ins.operand2)
-          envBind(env, ins.target, lhs*rhs)
+        case 'empty-dict-lit':
+          var table = new Table()
+          envBind(env, ins.target, table)
           break
-        case '/':
-          var lhs = envLookup(env, ins.operand1)
-          var rhs = envLookup(env, ins.operand2)
-          envBind(env, ins.target, lhs/rhs)
+        case 'put':
+          var table = envLookup(env, ins.dict)
+          var value = envLookup(env, ins.value)
+          var field = envLookup(env, ins.field)
+          table.put(field, value)
+          envBind(env, ins.target, null)
+          // btc.push({"type":"put","dict":reg1,"value": reg2,"field": reg3, "target":target})
           break
-        case '>':
-          var lhs = envLookup(env, ins.operand1)
-          var rhs = envLookup(env, ins.operand2)
-          envBind(env, ins.target, lhs > rhs)
-          break  
-        case '<':
-          var lhs = envLookup(env, ins.operand1)
-          var rhs = envLookup(env, ins.operand2)
-          envBind(env, ins.target, lhs < rhs)
-          break  
-        case '==':
-          var lhs = envLookup(env, ins.operand1)
-          var rhs = envLookup(env, ins.operand2)
-          envBind(env, ins.target, lhs == rhs)
-          break;
-        case '!=':
-          var lhs = envLookup(env, ins.operand1)
-          var rhs = envLookup(env, ins.operand2)
-          envBind(env, ins.target, lhs != rhs)
-          break;
         case 'asgn':
         // btc.push({"type":"asgn",'name':node.name.name,"value":reg1, "target": target})
           var lhs = envLookup(env, ins.value)
           envUpdate(env, ins.name, lhs)
           // envBind(env, ins.target, lhs)
+          break
         case 'id':
           envBind(env, ins.target, envLookup(env, ins.name))
           break
@@ -355,13 +346,23 @@ var interpret = function(asts, log, err) {
             // return envLookup(env, ins.false)
           }
           break
-        case 'int-lit':
-          envBind(env, ins.target, ins.value)
-          break
+
         case 'print':
-          envBind(env,  ins.target, envLookup(env, ins.value))
-          lo('p f')
-          log(envLookup(env, ins.value))
+          
+          var exp = envLookup(env, ins.value)
+          envBind(env,  ins.target, exp)
+          lo('p f', exp, ins.value)
+          if (typeof exp == 'object' && exp != null) {
+            if (exp.type == 'closure') {
+              log('closure')
+              break
+            }
+          }
+          if(exp instanceof Table){
+            log(exp.toString())
+            break
+          }
+          log(exp)
           break
         case 'lambda':
         // {"type":"lambda","arguments":[{"type":"id","name":"y"}],"target":"#btc-reg-2","body":[
@@ -401,7 +402,7 @@ var interpret = function(asts, log, err) {
           }
           break
         case 'return':
-          log('call stk', cs)
+          // log('call stk', cs)
           
           var ret = envLookup(env, ins.value)
           cs.pop()
@@ -420,6 +421,11 @@ var interpret = function(asts, log, err) {
           lo('there is null ,', ins)
           break
         default:
+          var op =['+', '-', '*', '/','==','!=','>','<','>=', '<=']
+          if (op.indexOf(ins.type) != -1 ){
+            bindOpresult(ins,env)
+            break;
+          }
           lo('default ins error', ins)
           throw new ExecError('wtfff ')
       }

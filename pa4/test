@@ -12,3 +12,18 @@ def g(a){
     a+1
 }
 print g(1+2)
+
+def iter() {
+    def i = 0
+    lambda () {
+        if (i < 10) {
+            i = i + 1
+            i 
+        } else {
+            null    
+        }
+    } 
+}
+def f = iter()
+print f()
+print f()
