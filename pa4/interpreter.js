@@ -27,14 +27,15 @@ var interpret = function(asts, log, err) {
         env:env,
     };
   }
+      // This helper function generates a unique register name
+  function uniquegen() {
+    return '#btc-reg-' + uniquegen.counter++;
+  }
   function compileToBytecode(ast) {
     // TODO step 2: Complete this function, which takes an AST as input
     // and produces bytecode as its output
 	  
-    // This helper function generates a unique register name
-    function uniquegen() {
-      return '#btc-reg-' + uniquegen.counter++;
-    }
+
     uniquegen.counter = 1;
     function expnode(node, target, btc) {
       switch (node.type) {
@@ -68,19 +69,48 @@ var interpret = function(asts, log, err) {
             var reg2 = uniquegen()
             expnode(node.operand2, reg2, btc)
             btc.push({"type":"/","operand1":reg1,"operand2":reg2,"target":target})
+        case '>':
+          var reg1 = uniquegen()
+          expnode(node.operand1, reg1, btc)
+          var reg2 = uniquegen()
+          expnode(node.operand2, reg2, btc)
+          btc.push({"type":">","operand1":reg1,"operand2":reg2,"target":target})
+          break
+        case '<':
+          var reg1 = uniquegen()
+          expnode(node.operand1, reg1, btc)
+          var reg2 = uniquegen()
+          expnode(node.operand2, reg2, btc)
+          btc.push({"type":"<","operand1":reg1,"operand2":reg2,"target":target})
+          break
+        case '==':
+          var reg1 = uniquegen()
+          expnode(node.operand1, reg1, btc)
+          var reg2 = uniquegen()
+          expnode(node.operand2, reg2, btc)
+          btc.push({"type":"==","operand1":reg1,"operand2":reg2,"target":target})
+        case '!=':
+          var reg1 = uniquegen()
+          expnode(node.operand1, reg1, btc)
+          var reg2 = uniquegen()
+          expnode(node.operand2, reg2, btc)
+          btc.push({"type":"!=","operand1":reg1,"operand2":reg2,"target":target})
+          break
         case 'id':
           btc.push({"type":"id","name":node.name ,"target":target})
           break
-
+        case "null":
+          btc.push({"type":"null","target":target})
           break
         case 'ite':
           var cond = uniquegen()
           var ct = uniquegen()
           var cf = uniquegen()
-          expnode(node.cond, cond, btc)
+          expnode(node.condition, cond, btc)
           expnode(node.true, ct, btc)
           expnode(node.false, cf, btc)
-          btc.push({"type":'ite', "condition":cond, "true":ct, "false":cf})
+          lo('')
+          btc.push({"type":'ite', "condition":cond, "true":ct, "false":cf, "target":target})
           break
         case 'lambda':
           // [{"type":"lambda","arguments":[{"type":"id","name":"y"}],"target":"#btc-reg-2","body":[
@@ -88,9 +118,9 @@ var interpret = function(asts, log, err) {
           break
         case 'call':
         // call node  {"function":{"type":"id","name":"fun"},"type":"call","arguments":[{"type":"int-lit","value":0}]}
-//         {"type":"id","name":"fun","target":"#btc-reg-14"},
-// {"type":"int-lit","value":0,"target":"#btc-reg-15"},
-// {"type":"call","function":"#btc-reg-14","arguments":["#btc-reg-15"],"target":"#btc-reg-13"},
+        //{"type":"id","name":"fun","target":"#btc-reg-14"},
+        //{"type":"int-lit","value":0,"target":"#btc-reg-15"},
+        // {"type":"call","function":"#btc-reg-14","arguments":["#btc-reg-15"],"target":"#btc-reg-13"},
           var func = uniquegen()
           expnode(node.function, func, btc)
           var args = []
@@ -133,7 +163,11 @@ var interpret = function(asts, log, err) {
           expnode(node.value, reg1, btc)
           btc.push({"type":"print","value":reg1, "target": target})
           break
-
+        case 'asgn':
+          var reg1 = uniquegen()
+          expnode(node.value, reg1, btc)
+          btc.push({"type":"asgn",'name':node.name.name,"value":reg1, "target": target})
+          break;
         default:
           lo('default btcnode error', node)
           throw new ExecError('wtfff ')
@@ -216,24 +250,39 @@ var interpret = function(asts, log, err) {
 
   // Returns a new program state object, a data structure which stores
   // information about a particular stack
-  function makeProgramState(bytecode, env, argName) {
+  function makeProgramState(ps, bytecode, env, argName) {
     // TODO step 3: decide what you need to store in a program state
     // object based on what your bytecode interpreter needs.
     // Decide whether the arguments above are sufficient.
-    var retReg = null
-    return makeStackFrame(bytecode, env, retReg)
+    if (ps == null) {
+      ps = {
+        'status': 'suspend',
+        'main': false,
+        'callStack': [],
+      }
+    }
+    var retReg = uniquegen()
+    // var retReg = null;
+    var frame = makeStackFrame(bytecode, env, retReg)
+    ps.callStack.push(frame)
+    return ps
   }
 
   function resumeProgram(programState, log) {
     // TODO step 3: implement this function, which executes
     // bytecode.  See how it's called in the execBytecode function.
-    lo('ps ', programState)
-    var btc = programState['bytecode']
-    var pc = programState['pc']
-    var env = programState['env']
+    var cs = programState.callStack
+    var frame = cs[cs.length-1]
+    lo('ps ', frame)
+    var btc = frame['bytecode']
+    var env = frame['env']
     lo('resume btc', btc)
-    while (pc < btc.length) {
-      var ins = btc[pc]
+    while (frame['pc'] < btc.length) {
+      if (frame['pc'] == 0) {
+        lo('first frame  ', btc)
+        
+      }
+      var ins = btc[frame['pc']]
       switch(ins.type) {
         case '+':
           var lhs = envLookup(env, ins.operand1)
@@ -256,8 +305,36 @@ var interpret = function(asts, log, err) {
           var rhs = envLookup(env, ins.operand2)
           envBind(env, ins.target, lhs/rhs)
           break
+        case '>':
+          var lhs = envLookup(env, ins.operand1)
+          var rhs = envLookup(env, ins.operand2)
+          envBind(env, ins.target, lhs > rhs)
+          break  
+        case '<':
+          var lhs = envLookup(env, ins.operand1)
+          var rhs = envLookup(env, ins.operand2)
+          envBind(env, ins.target, lhs < rhs)
+          break  
+        case '==':
+          var lhs = envLookup(env, ins.operand1)
+          var rhs = envLookup(env, ins.operand2)
+          envBind(env, ins.target, lhs == rhs)
+          break;
+        case '!=':
+          var lhs = envLookup(env, ins.operand1)
+          var rhs = envLookup(env, ins.operand2)
+          envBind(env, ins.target, lhs != rhs)
+          break;
+        case 'asgn':
+        // btc.push({"type":"asgn",'name':node.name.name,"value":reg1, "target": target})
+          var lhs = envLookup(env, ins.value)
+          envUpdate(env, ins.name, lhs)
+          // envBind(env, ins.target, lhs)
         case 'id':
           envBind(env, ins.target, envLookup(env, ins.name))
+          break
+        case "null":
+          envBind(env, ins.target, null)
           break
         case 'def':
           envBind(env, ins.name, envLookup(env, ins.value))
@@ -272,9 +349,10 @@ var interpret = function(asts, log, err) {
             throw new ExecError('Condition not a boolean');
           }
           if (cond) {
-            return envLookup(env, ins.true)
+            envBind(env, ins.target, envLookup(env, ins.true))
           } else {
-            return envLookup(env, ins.false)
+            envBind(env, ins.target, envLookup(env, ins.false))
+            // return envLookup(env, ins.false)
           }
           break
         case 'int-lit':
@@ -305,23 +383,48 @@ var interpret = function(asts, log, err) {
               throw new ExecError('args length not equal');
             }
             lo('new env ' ,newEnv)
-            var res = execBytecode(fn.body, newEnv, log)
-            log('exec result ', res)
-            envBind(env, ins.target, res)
+            // var res = execBytecode(fn.body, newEnv, log)
+            lo('fn.body  ', fn.body)
+            programState = makeProgramState(programState, fn.body, newEnv)
+             cs = programState.callStack
+             frame = cs[cs.length-1]
+            lo('ps ', frame)
+             btc = frame['bytecode']
+            //  pc = frame['pc']
+             env = frame['env']
+             continue
+            // log('exec result ', res)
+            // envBind(env, ins.target, res)
           } else {
-            throw new ExecError('Trying to call non-lambda');
+            // lo('pc :', frame['pc'], bec)
+            throw new ExecError('Trying to call non-lambda, not function');
           }
           break
         case 'return':
-          return envLookup(env, ins.value)
+          log('call stk', cs)
+          
+          var ret = envLookup(env, ins.value)
+          cs.pop()
+          if (cs.length) {
+            frame = cs[cs.length-1] 
+            btc = frame['bytecode']
+            env = frame['env']
+            ins = btc[frame['pc']]
+            envBind(env, ins.target, ret)
+          } else { 
+            return ret
+          }
           // envBind()
+          break
+        case 'null':
+          lo('there is null ,', ins)
           break
         default:
           lo('default ins error', ins)
           throw new ExecError('wtfff ')
       }
-      pc+=1
-      lo('pc num', pc)
+      frame['pc']+=1
+      lo('pc num', frame['pc'])
     }
 
   }
@@ -330,7 +433,13 @@ var interpret = function(asts, log, err) {
     // TODO step 3: based on how you decide to implement
     // makeProgramState, make sure the makeProgramState call below
     // suits your purposes.
-    return resumeProgram(makeProgramState(bytecode, env), log);
+    var ps ={
+      'name': 'main',
+      'status': 'running',
+      'main': true,
+      'callStack': [],
+    }
+    return resumeProgram(makeProgramState(ps, bytecode, env), log);
   }
 
   function tailCallOptimization(insts){

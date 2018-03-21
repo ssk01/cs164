@@ -1,0 +1,14 @@
+lambda(){print 1}()
+def f(){
+print 1
+}
+def g(){
+print 2
+}
+ite(1, f,g)()
+
+
+def g(a){
+    a+1
+}
+print g(1+2)

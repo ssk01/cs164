@@ -4,6 +4,11 @@
 *.164 [] => emtpty [] 
 
 #interpreter
-219 execBytecode
+<!-- 219 execBytecode -->
 
 def return
+def ret reg
+
+# ...
+ite 
+<>==
