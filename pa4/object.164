@@ -1,5 +1,5 @@
-## TODO: Make Object!
-#
+# TODO: Make Object!
+
 # The base class in our object hierarchy. All other classes must inherit from
 # the root Object class. Has two methods:
 # 
@@ -18,4 +18,3 @@ Object.new = lambda(self, obj) {
     self.__index = self
     obj
 }
-

@@ -74,10 +74,11 @@ window.onload = function(){
     
   document.getElementById("go").onclick = function() {
     var srcFiles = ["library.164", "object.164"];
+    // var srcFiles = ["library.164"];
 	  var srcs = [];
-    // for (var i in srcFiles){
-    //   srcs.push(readStringFromFileAtPath(srcFiles[i]));
-    // }
+    for (var i in srcFiles){
+      srcs.push(readStringFromFileAtPath(srcFiles[i]));
+    }
 	
 	  var out = document.getElementById("out");
 	  while (out.firstChild) {

@@ -31,6 +31,7 @@ var interpret = function(asts, log, err) {
   function uniquegen() {
     return '#btc-reg-' + uniquegen.counter++;
   }
+  uniquegen.counter = 1;
   function compileToBytecode(ast) {
     // TODO step 2: Complete this function, which takes an AST as input
     // and produces bytecode as its output
@@ -42,7 +43,7 @@ var interpret = function(asts, log, err) {
       btc.push({"type":node.type,"operand1":reg1,"operand2":reg2,"target":target})
     }
 
-    uniquegen.counter = 1;
+
     function expnode(node, target, btc) {
       switch (node.type) {
         case 'int-lit':
@@ -177,6 +178,7 @@ var interpret = function(asts, log, err) {
         // If the body of the lambda is empty, return val is null
         target = uniquegen();
         btc.push({'type': 'null', 'target': target});
+        btc.push({'type': 'return', 'value': target});
       } else {
         btc.push({'type': 'return', 'value': target});
       }
@@ -352,7 +354,7 @@ var interpret = function(asts, log, err) {
         // btc.push({"type":"asgn",'name':node.name.name,"value":reg1, "target": target})
           var lhs = envLookup(env, ins.value)
           envUpdate(env, ins.name, lhs)
-          // envBind(env, ins.target, lhs)
+          envBind(env, ins.target, null)
           break
         case 'id':
           envBind(env, ins.target, envLookup(env, ins.name))
@@ -449,9 +451,6 @@ var interpret = function(asts, log, err) {
             return ret
           }
           // envBind()
-          break
-        case 'null':
-          lo('there is null ,', ins)
           break
         default:
           var op =['+', '-', '*', '/','==','!=','>','<','>=', '<=', 'in']

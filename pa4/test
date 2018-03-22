@@ -27,3 +27,36 @@ def iter() {
 def f = iter()
 print f()
 print f()
+
+
+
+Object.new = lambda(self, obj) {
+    if (obj == null) {
+        obj = {}
+    }
+    print 'fuck'
+    print self
+    setmetatable(obj, self)
+    self.__index = self
+    obj
+}
+
+
+
+def _getIterator_(list) {
+    # 0-1 because we currently don't support unary minus
+    def i = 0-1
+    lambda() {
+         i = i + 1
+         if (i < len(list)) { list[i]
+         } else { null } # terminates iteration
+    } 
+}
+def l1 = {}
+l1[0] = 0
+l1[1] = 1
+l1[2] = 2
+def l2 = _getIterator_(l1)
+print l2()
+print l2()
+print l2()
