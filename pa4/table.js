@@ -9,6 +9,7 @@ var lo = function(){}
 function Table() {
   this.table = {}
   this.int_dict = {}
+  this.type = 'table'
   // return table
 }
 

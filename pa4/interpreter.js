@@ -54,7 +54,17 @@ var interpret = function(asts, log, err) {
         case 'empty-dict-lit':
           btc.push({"type":"empty-dict-lit","target": target})
           break
-        case 'put':
+        case 'len':
+          var reg1 = uniquegen()
+          expnode(node.dict, reg1, btc)
+          btc.push({"type":"len","value":reg1,"target": target})
+          break
+        case 'get':
+          var reg1 = uniquegen()
+          expnode(node.dict, reg1, btc)
+          var reg2 = uniquegen()
+          expnode(node.field, reg2, btc)
+          btc.push({"type":"get","dict":reg1,"field":reg2,"target": target})
           break
         case 'exp':
           expnode(node.body, target, btc)
@@ -99,7 +109,7 @@ var interpret = function(asts, log, err) {
           lo('call node ', j(code))
           break
         default:
-          var op =['+', '-', '*', '/','==','!=','>','<','>=', '<=']
+          var op =['+', '-', '*', '/','==','!=','>','<','>=', '<=','in']
           if (op.indexOf(node.type) != -1 ){
             pushOp(node, btc, target)
             break
@@ -279,6 +289,9 @@ var interpret = function(asts, log, err) {
     else if (ins.type == '<=') {
       result = (lhs<=rhs)
     }
+    else if (ins.type == 'in') {
+      result = (rhs.has_key(lhs))
+    }
     envBind(env, ins.target, result)
   }
   function resumeProgram(programState, log) {
@@ -315,6 +328,26 @@ var interpret = function(asts, log, err) {
           envBind(env, ins.target, null)
           // btc.push({"type":"put","dict":reg1,"value": reg2,"field": reg3, "target":target})
           break
+        case 'len':
+          var table = envLookup(env, ins.value)
+          if (table.type == 'table') {
+            var lens = table.get_length()
+            envBind(env, ins.target, lens)
+          } else {
+            lo('len false ')
+          }
+          break
+        case 'get':
+          var table = envLookup(env, ins.dict)
+          var field = envLookup(env, ins.field)
+          if (table.type == 'table') {
+            var value = table.get(field)
+            envBind(env, ins.target, value)
+          } else {
+            lo('len false ')
+          }
+          break
+
         case 'asgn':
         // btc.push({"type":"asgn",'name':node.name.name,"value":reg1, "target": target})
           var lhs = envLookup(env, ins.value)
@@ -421,7 +454,7 @@ var interpret = function(asts, log, err) {
           lo('there is null ,', ins)
           break
         default:
-          var op =['+', '-', '*', '/','==','!=','>','<','>=', '<=']
+          var op =['+', '-', '*', '/','==','!=','>','<','>=', '<=', 'in']
           if (op.indexOf(ins.type) != -1 ){
             bindOpresult(ins,env)
             break;

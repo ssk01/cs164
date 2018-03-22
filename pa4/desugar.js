@@ -18,14 +18,14 @@ var desugarAST = (function() {
     "if": " ite(%condition,lambda(){%true}, lambda(){%false}  )()",
     "while":"lambda(){def %u1 = lambda(cond, b){ite(cond(), lambda(){b(); %u1(cond,b)},lambda(){})();}; %u1(lambda(){%condition},lambda(){ %body})}()",
     // "while":"lambda(){}()",
-    "for": "lambda(){def %u2 = null; def %u3 = %iterable;"+
-            "%u2=%u3;"+
-                "def %name = %u2();"+
-          "while(%name!=null) {lambda(%name){%body}(%name); %name = %u2();}}()",
     // "for": "lambda(){def %u2 = null; def %u3 = %iterable;"+
-    //         "if(type(%u3)=='table'){%u2=_getIterator_(%u3);}else{%u2=%u3};"+
+    //         "%u2=%u3;"+
     //             "def %name = %u2();"+
     //       "while(%name!=null) {lambda(%name){%body}(%name); %name = %u2();}}()",
+    "for": "lambda(){def %u2 = null; def %u3 = %iterable;"+
+            "if(type(%u3)=='table'){%u2=_getIterator_(%u3);}else{%u2=%u3};"+
+                "def %name = %u2();"+
+          "while(%name!=null) {lambda(%name){%body}(%name); %name = %u2();}}()",
 
 
     //   "comprehension": "lambda(){"+
