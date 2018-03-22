@@ -196,6 +196,9 @@ var interpret = function(asts, log, err) {
         }
         // console.log('cond, ', node.condition,cond)
         return cond ? ct : cf;
+      case "exp":
+        /*special case for type*/
+        return evalExpression(node.body,env);
       case "lambda":
         // console.log('lambda make closure ', JSON.stringify(node))
         return makeClosure(node.arguments, node.body, env);
@@ -235,11 +238,11 @@ var interpret = function(asts, log, err) {
         }
       default:
         console.log('not match op expression', j(node), node)
-        if (node.type == 'exp'){
-          lo('what fuck about exp')
-          return evalStatement(node, env)
-          // return
-        }
+        // if (node.type == 'exp'){
+        //   lo('what fuck about exp')
+        //   return evalStatement(node, env)
+        //   // return
+        // }
         throw new Error(
           "What's " + node.type + "? " + JSON.stringify(node)
       );
@@ -268,8 +271,19 @@ var interpret = function(asts, log, err) {
         table.put(field, value)
         return null;
     case "print":
-      // console.log(evalExpression(node.value, env))
-      log(evalExpression(node.value, env));
+      var exp = evalExpression(node.value, env);
+      console.log('exp...',exp, )
+      if (typeof exp == 'object' && exp != null) {
+        if (exp.type == 'closure') {
+          log('closure')
+          return null
+        }
+      }
+      if(exp instanceof Table){
+        log(exp.toString())
+        return null;
+      }
+      log(exp)
       return null;
     case "error":
       throw new ExecError(evalExpression(node.message, env));
