@@ -46,6 +46,23 @@ var interpret = function(asts, log, err) {
 
     function expnode(node, target, btc) {
       switch (node.type) {
+        case 'yield':
+          var reg1 = uniquegen()
+          expnode(node.arg, reg1, btc)
+          btc.push({'type':'yield','arg':reg1, "target":target})
+          break
+        case 'coroutine':
+          btc.push({'type':'coroutine','body':node.body, "target":target})
+          break
+        case 'resume':
+          // log('resume')
+          var reg1 = uniquegen()
+          expnode(node.arg, reg1, btc)
+          var reg2 = uniquegen()
+          expnode(node.coroutine, reg2, btc)
+          btc.push({"type":"resume","arg":reg1, "coroutine":reg2, "target": target})
+          // {"arg":{"type":"null"},"type":"resume","coroutine":{"type":"id","name":"co"}}}]
+          break
         case 'int-lit':
           btc.push({"type":"int-lit","value":node.value,"target": target})
           break
@@ -246,6 +263,8 @@ var interpret = function(asts, log, err) {
     // Decide whether the arguments above are sufficient.
     if (ps == null) {
       ps = {
+        'name':argName,
+        'from': null,
         'status': 'suspend',
         'main': false,
         'callStack': [],
@@ -299,6 +318,8 @@ var interpret = function(asts, log, err) {
   function resumeProgram(programState, log) {
     // TODO step 3: implement this function, which executes
     // bytecode.  See how it's called in the execBytecode function.
+    var allPs = []
+    allPs.push(programState)
     var cs = programState.callStack
     var frame = cs[cs.length-1]
     lo('ps ', frame)
@@ -363,8 +384,11 @@ var interpret = function(asts, log, err) {
           envBind(env, ins.target, null)
           break
         case 'def':
+          lo(ins.name, 'name ',ins.value)
           envBind(env, ins.name, envLookup(env, ins.value))
           envBind(env, ins.target, envLookup(env, ins.name))
+          lo('env',env)
+          
           break
         case 'ite':
           var cond = envLookup(env, ins.condition)
@@ -404,6 +428,61 @@ var interpret = function(asts, log, err) {
           var closure = makeClosure(ins.arguments, ins.body, env)
           envBind(env, ins.target, closure)
           break;
+        case 'yield':
+          var ret = envLookup(env, ins.arg)
+          var n = programState.from
+          frame.pc += 1 
+          lo('yield co', programState.name)
+          for (var i = 0; i <allPs.length; i++) {
+            var p = allPs[i]
+            programState = p
+            cs = programState.callStack
+            frame = cs[cs.length-1]
+            btc = frame['bytecode']
+            env = frame['env']
+            ins = btc[frame['pc']]
+            envBind(env, ins.target, ret)
+            lo('return  yied times', p.name, ret)
+            break
+          }
+          break
+        case 'coroutine':
+          lo('env',env)
+          var name = ins.body.name
+          var fun = envLookup(env, name)
+          fun.name = name
+          if (fun.type == 'closure') {
+            // throw new ExecError('Condition not a boolean');
+            var newps = makeProgramState(null, fun.body, fun.env, name);
+            allPs.push(newps)
+            lo('all ps ', allPs)
+            envBind(env, ins.target, fun)
+          } else {
+            lo('coroutine fun error ')
+          }
+          break
+        case 'resume':
+          var co = envLookup(env, ins.coroutine)
+          lo('resume coroutine ', co)
+          //todo
+          // var arg 
+          var n = co.name
+          for (var i = 0; i <allPs.length; i++) {
+            var p = allPs[i]
+            if (p.name == n ) {
+              p.from = programState.name
+              programState = p
+              cs = programState.callStack
+              frame = cs[cs.length-1]
+              btc = frame['bytecode']
+              env = frame['env']
+              lo('find ps times')
+              break
+            }
+          }
+          continue
+          // btc.push({"type":"resume","arg":reg1, "coroutine":reg2, "target": target})
+          break
         case 'call':
 
         // {"type":"call","function":"#btc-reg-14","arguments":["#btc-reg-15"],"target":"#btc-reg-13"},
@@ -514,7 +593,7 @@ var interpret = function(asts, log, err) {
 
   desugarAll(asts, [], function(desugaredAsts) {
     lo('asts ', asts)
-    lo('desuger ast', desugaredAsts)
+    lo('desuger ast', desugaredAsts[2], j(desugaredAsts[2]))
     for (var i = 0, ii = desugaredAsts.length; i < ii; ++i) {
       try {
         var bytecode = compileToBytecode(desugaredAsts[i]);
