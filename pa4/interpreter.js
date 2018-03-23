@@ -242,28 +242,29 @@ var interpret = function(asts, log, err) {
 
   // Returns a stack frame, a data structure which stores 
   // information about the state of a function
-  function makeStackFrame(bytecode, env, retReg) {
+  function makeStackFrame(bytecode, env, retReg,argName) {
     // TODO step 3: decide what you need to store in a stack frame
     // based on what your bytecode interpreter needs.
     // Decide whether the arguments above are sufficient.
-    lo('make stack frame ', bytecode)
+    // lo('make stack frame ', bytecode)
     return {
       'bytecode':bytecode,
       'pc':0,
       'ret': retReg,
       'env': env,
+      'arg':argName,
     }
   }
 
   // Returns a new program state object, a data structure which stores
   // information about a particular stack
-  function makeProgramState(ps, bytecode, env, argName) {
+  function makeProgramState(ps, bytecode, env, Name,argName) {
     // TODO step 3: decide what you need to store in a program state
     // object based on what your bytecode interpreter needs.
     // Decide whether the arguments above are sufficient.
     if (ps == null) {
       ps = {
-        'name':argName,
+        'name':Name,
         'from': null,
         'status': 'suspend',
         'main': false,
@@ -272,7 +273,7 @@ var interpret = function(asts, log, err) {
     }
     var retReg = uniquegen()
     // var retReg = null;
-    var frame = makeStackFrame(bytecode, env, retReg)
+    var frame = makeStackFrame(bytecode, env, retReg,argName)
     ps.callStack.push(frame)
     return ps
   }
@@ -332,6 +333,7 @@ var interpret = function(asts, log, err) {
         
       }
       var ins = btc[frame['pc']]
+      lo('pc num', frame['pc'], j(ins))
       switch(ins.type) {
         case 'int-lit':
           envBind(env, ins.target, ins.value)
@@ -429,22 +431,25 @@ var interpret = function(asts, log, err) {
           envBind(env, ins.target, closure)
           break;
         case 'yield':
-          var ret = envLookup(env, ins.arg)
-          var n = programState.from
-          frame.pc += 1 
-          lo('yield co', programState.name)
-          for (var i = 0; i <allPs.length; i++) {
-            var p = allPs[i]
-            programState = p
-            cs = programState.callStack
-            frame = cs[cs.length-1]
-            btc = frame['bytecode']
-            env = frame['env']
-            ins = btc[frame['pc']]
-            envBind(env, ins.target, ret)
-            lo('return  yied times', p.name, ret)
-            break
+          if (programState.main == true) {
+            throw new ExecError('main coroutine can not yield')
           }
+          var ret = envLookup(env, ins.arg)
+          programState.status = 'suspend'
+          // frame.pc += 1
+          lo('yield next pc ',btc[frame.pc])
+          var p = programState.from
+          programState = p
+          cs = programState.callStack
+          if (cs.length == 0) {
+            lo('ps', programState)
+            throw new ExecError('it is impossible')
+          }
+          frame = cs[cs.length-1]
+          btc = frame['bytecode']
+          env = frame['env']
+          ins = btc[frame['pc']]
+          envBind(env, ins.target, ret)
           break
         case 'coroutine':
           lo('env',env)
@@ -453,38 +458,53 @@ var interpret = function(asts, log, err) {
           fun.name = name
           if (fun.type == 'closure') {
             // throw new ExecError('Condition not a boolean');
-            var newps = makeProgramState(null, fun.body, fun.env, name);
+            var newps = makeProgramState(null, fun.body, fun.env, name, fun.names);
             allPs.push(newps)
+            newps.from = programState
             lo('all ps ', allPs)
-            envBind(env, ins.target, fun)
+            envBind(env, ins.target, newps)
           } else {
             lo('coroutine fun error ')
           }
           break
         case 'resume':
-          var co = envLookup(env, ins.coroutine)
-          lo('resume coroutine ', co)
+          var p = envLookup(env, ins.coroutine)
+          lo('resume ',ins)
+          // lo('resume coroutine ', co)
           //todo
-          // var arg 
-          var n = co.name
-          for (var i = 0; i <allPs.length; i++) {
-            var p = allPs[i]
-            if (p.name == n ) {
-              p.from = programState.name
-              programState = p
-              cs = programState.callStack
-              frame = cs[cs.length-1]
-              btc = frame['bytecode']
-              env = frame['env']
-              lo('find ps times')
-              break
+          var arg = envLookup(env, ins.arg)
+          // var n = co.name
+          // for (var i = 0; i <allPs.length; i++) {
+          //   var p = allPs[i]
+          //   if (p.name == n ) {
+          //     p.from = programState.name
+          if (p.status == 'suspend') {
+            programState = p
+            cs = programState.callStack
+            frame = cs[cs.length-1]
+            btc = frame['bytecode']
+            env = frame['env']
+            ins = btc[frame.pc]
+            if (frame.pc == 0) {
+              var newEnv = envExtend(env)
+
+              envBind(newEnv,frame.arg[0].name  ,arg)
+              lo('fuck', frame.arg,arg)
+              frame.env = newEnv
+              env = newEnv
+              continue
+            } else {
+              envBind(env, ins.target, arg)
+
             }
+          } else {
+            throw new ExecError('Coroutine not resumable.')
           }
-          continue
+          lo('find ps times')
+              // break
           // btc.push({"type":"resume","arg":reg1, "coroutine":reg2, "target": target})
           break
         case 'call':
-
         // {"type":"call","function":"#btc-reg-14","arguments":["#btc-reg-15"],"target":"#btc-reg-13"},
           var fn = envLookup(env, ins.function)
           if (fn.type && fn.type === 'closure') {
@@ -497,13 +517,13 @@ var interpret = function(asts, log, err) {
             } else {
               throw new ExecError('args length not equal');
             }
-            lo('new env ' ,newEnv)
+            // lo('new env ' ,newEnv)
             // var res = execBytecode(fn.body, newEnv, log)
-            lo('fn.body  ', fn.body)
+            // lo('fn.body  ', fn.body)
             programState = makeProgramState(programState, fn.body, newEnv)
              cs = programState.callStack
              frame = cs[cs.length-1]
-            lo('ps ', frame)
+            // lo('ps ', frame)
              btc = frame['bytecode']
             //  pc = frame['pc']
              env = frame['env']
@@ -517,7 +537,7 @@ var interpret = function(asts, log, err) {
           break
         case 'return':
           // log('call stk', cs)
-          
+          // lo('return ss', frame.pc)
           var ret = envLookup(env, ins.value)
           cs.pop()
           if (cs.length) {
@@ -526,8 +546,21 @@ var interpret = function(asts, log, err) {
             env = frame['env']
             ins = btc[frame['pc']]
             envBind(env, ins.target, ret)
-          } else { 
-            return ret
+          } else {
+            if (programState.main == false) {
+              programState.status = 'end';
+              var p = programState.from
+              programState = p
+              cs = programState.callStack
+              frame = cs[cs.length-1]
+              btc = frame['bytecode']
+              env = frame['env']
+              ins = btc[frame['pc']]
+              envBind(env, ins.target, ret)
+              // continue
+            } else {
+              return ret
+            }
           }
           // envBind()
           break
@@ -541,7 +574,6 @@ var interpret = function(asts, log, err) {
           throw new ExecError('wtfff ')
       }
       frame['pc']+=1
-      lo('pc num', frame['pc'])
     }
 
   }
@@ -598,7 +630,7 @@ var interpret = function(asts, log, err) {
       try {
         var bytecode = compileToBytecode(desugaredAsts[i]);
         tailCallOptimization(bytecode);
-        lo('bytecode after tail', j(bytecode))
+        lo('bytecode after tail', j(bytecode),bytecode)
         execBytecode(bytecode, root, log);
       } catch (e) {
         if (e instanceof ExecError) {

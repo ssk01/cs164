@@ -1,24 +1,40 @@
+def f(unused){
+    yield(1)
+    2
+}
+def co = coroutine(f)
+print 222
+print resume(co,null)
+print 233
+print resume(co,null)
+print 222
+print resume(co,null)
+
+_________________________
 def k(x, y) {
     yield(x+y)
 }
-def g(x, y) {
+def g(x) {
     def ck = coroutine(k)
     def h(a, b) {
-        3 + yield(resume(ck, a, b))
+         yield(resume(ck, a, b)+3)
     }
-    h(x, y)
+    h(x, 3)
 }
 def f(x, y) {
     def cg = coroutine(g)
-    resume(cg, x, y)
+    print resume(cg, x+ y)
 }
+print f(1,2)
 _________________________________
 def f(unused){
     yield(1)
     2
 }
 def co = coroutine(f)
+print 222
 print resume(co,null)
+print 233
 _________________________________
 lambda(){print 1}()
 def f(){
