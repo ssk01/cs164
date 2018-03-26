@@ -52,7 +52,9 @@ var interpret = function(asts, log, err) {
           btc.push({'type':'yield','arg':reg1, "target":target})
           break
         case 'coroutine':
-          btc.push({'type':'coroutine','body':node.body, "target":target})
+          var reg1 = uniquegen()
+          expnode(node.body, reg1, btc)
+          btc.push({'type':'coroutine','body':reg1, "target":target})
           break
         case 'resume':
           // log('resume')
@@ -316,10 +318,10 @@ var interpret = function(asts, log, err) {
     }
     envBind(env, ins.target, result)
   }
+  var allPs = []
   function resumeProgram(programState, log) {
     // TODO step 3: implement this function, which executes
     // bytecode.  See how it's called in the execBytecode function.
-    var allPs = []
     allPs.push(programState)
     var cs = programState.callStack
     var frame = cs[cs.length-1]
@@ -329,7 +331,7 @@ var interpret = function(asts, log, err) {
     lo('resume btc', btc)
     while (frame['pc'] < btc.length) {
       if (frame['pc'] == 0) {
-        lo('first frame  ', btc)
+        lo('first frame  ',  cs.length, btc, j(btc))
         
       }
       var ins = btc[frame['pc']]
@@ -411,8 +413,8 @@ var interpret = function(asts, log, err) {
         case 'print':
           
           var exp = envLookup(env, ins.value)
-          envBind(env,  ins.target, exp)
-          lo('p f', exp, ins.value)
+          envBind(env,  ins.target, null)
+          // lo('p f', exp, ins.value)
           if (typeof exp == 'object' && exp != null) {
             if (exp.type == 'closure') {
               log('closure')
@@ -453,12 +455,12 @@ var interpret = function(asts, log, err) {
           break
         case 'coroutine':
           lo('env',env)
-          var name = ins.body.name
+          var name = ins.body
           var fun = envLookup(env, name)
-          fun.name = name
+          // fun.name = name
           if (fun.type == 'closure') {
             // throw new ExecError('Condition not a boolean');
-            var newps = makeProgramState(null, fun.body, fun.env, name, fun.names);
+            var newps = makeProgramState(null, fun.body, fun.env, null, fun.names);
             allPs.push(newps)
             newps.from = programState
             lo('all ps ', allPs)
@@ -520,7 +522,9 @@ var interpret = function(asts, log, err) {
             // lo('new env ' ,newEnv)
             // var res = execBytecode(fn.body, newEnv, log)
             // lo('fn.body  ', fn.body)
+            lo('allps ', allPs, programState)
             programState = makeProgramState(programState, fn.body, newEnv)
+            lo('allps ', allPs, programState)
              cs = programState.callStack
              frame = cs[cs.length-1]
             // lo('ps ', frame)
@@ -564,6 +568,27 @@ var interpret = function(asts, log, err) {
           }
           // envBind()
           break
+        case 'tailCall':
+          var fn = envLookup(env, ins.function)
+          if (fn.type && fn.type === 'closure') {
+            var newEnv = envExtend(fn.env)
+            if (ins.arguments.length == fn.names.length) {
+              for (var i = 0; i < fn.names.length; i++) {
+                lo('new env  ',newEnv, 'name',fn.names[i].name, envLookup(env, ins.arguments[i]))
+                envBind(newEnv, fn.names[i].name, envLookup(env, ins.arguments[i]))
+              }
+            } else {
+              throw new ExecError('args length not equal');
+            }
+            var newframe =makeStackFrame(fn.body, newEnv, ins.target)
+            cs.pop()
+            cs.push(newframe)
+            frame = newframe
+            btc = frame['bytecode']
+            env = frame['env']
+            ins = btc[frame['pc']]
+            continue
+          }
         default:
           var op =['+', '-', '*', '/','==','!=','>','<','>=', '<=', 'in']
           if (op.indexOf(ins.type) != -1 ){
@@ -588,7 +613,9 @@ var interpret = function(asts, log, err) {
       'main': true,
       'callStack': [],
     }
-    return resumeProgram(makeProgramState(ps, bytecode, env), log);
+    var res = resumeProgram(makeProgramState(ps, bytecode, env), log);
+    lo('in the end ', allPs)
+    return res
   }
 
   function tailCallOptimization(insts){
@@ -596,6 +623,19 @@ var interpret = function(asts, log, err) {
     // It should take bytecode as input and transform call instructions
     // into tcall instructions if they can be optimized with the
     // tail call optimization.
+    for (var i = 0; i < insts.length; i++) {
+      if (insts[i]['type'] == 'lambda') {
+        tailCallOptimization(insts[i].body)
+      }
+    }
+    lo('tcall type, ',insts,insts)
+    if (insts.length > 1 && insts[insts.length-2]['type']  == 'call') {
+      // var ins = insts[insts.length-2]
+      // inst
+      insts[insts.length-2]['type'] = 'tailCall'
+      lo('are you ok', insts[insts.length-2])
+    }      
+    
   }
 
   function desugarAll(remaining, desugared, callback) {

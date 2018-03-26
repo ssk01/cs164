@@ -1,8 +1,14 @@
+return reg
+tail op
+
 def f(unused){
     yield(1)
     2
 }
-def co = coroutine(f)
+def co = coroutine(lambda(a){print 1;
+yield(333);
+print 2;
+})
 print 222
 print resume(co,null)
 print 233
